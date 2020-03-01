@@ -1,4 +1,4 @@
-# ArchLinux Dotfiles
+# dotfiles-arch
 
 ## Contents
 1. [Overview](#overview)
