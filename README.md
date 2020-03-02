@@ -8,11 +8,11 @@
 5. [Display/Window managers](#display-and-window-managers)
 
 ## Overview
-This repoistory contains the dotfiles for my ArchLinux installation, as well as a step-by-step tutorial on how to install Arch Linux from scratch on a machine. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities.
+This repoistory contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities.
 
 ## Getting Started
 ### Formatting your USB
-In order to burn an ISO image, it is good practice to format your USB device first. After plugging in your USB, you should be identify it by running the command below. It is good practice and less of a headache if you perform all these operations as root (via `sudo` or via `su -`). Your USB device will likely be at the bottom of the STDOUT and will resemble something like the following:
+Before diving in, it is good practice to format your USB device first. After plugging in your USB, you should be identify it by running the command below. It will be less of a headache if you perform all these operations as root (via `sudo` or via `su -`). Your USB device will likely be at the bottom of the STDOUT and will resemble something like the following:
 
 ```sh
   $ fdisk -l
@@ -26,13 +26,7 @@ In order to burn an ISO image, it is good practice to format your USB device fir
   Disk identifier: 0x3372b9d9
 ```
 
-After identifying your drive, you can format it via `fdisk`. Keep it mind that you will likely have to chance `sda` to whatever you determined from the output of the previous command.
-
- ```sh
-  $ fdisk /dev/sda
- ```
- 
- Delete all the patitions from the disk with the `d` option, until `p` no longer lists any devices. If you are successful, running `lsblk` will show your USB device without any subdevices/partitions.
+After identifying your drive, you can format it via `fdisk /dev/sda`. Keep it mind that you will likely have to chance `sda` to whatever you determined from the output of the previous command. Delete all the patitions from the disk with the `d` option, until `p` no longer lists any devices. If you are successful, running `lsblk` will show your USB device without any subdevices/partitions.
  
  ```sh
   $ lsblk
@@ -44,9 +38,9 @@ After identifying your drive, you can format it via `fdisk`. Keep it mind that y
 ```
 
 ### Burning the latest Arch Linux ISO
-You need the ISO file in order to burn it to a USB and install it on your computer. You can download the correct ISO for your region from the official download page here (https://www.archlinux.org/download/).
+You need the ISO file in order to burn it to a USB and install it on your computer. You can download the correct ISO for your region from the official download page here (https://www.archlinux.org/download/). Keep in mind that these ISOs might differ depending on mirror server, so choose it carefully and from a reputable source.
 
-Once you've downloaded the ISO, you can easily burn it to your USB device using `dd`. Remember to point the `if` argument to the location to which you downloaded the ISO, and the `of` argument to the USB device onto which to burn it.
+Once you've downloaded the ISO, you can easily burn it to your USB device using `dd`. Remember to point the `if` argument to the location to which you downloaded the ISO and the `of` argument to the USB device onto which to burn it. Depending on the capabilities of your drive and your USB protocol version, this might take a minute.
 
 ```sh
   $ dd bs=4M if=./archlinux-2020.03.01-x86_64.iso of=/dev/sda status=progress oflag=sync
