@@ -12,7 +12,7 @@ This repoistory contains the dotfiles for my Arch Linux installation, as well as
 
 ## Getting Started
 ### Formatting your USB
-Before diving in, it is good practice to format your USB device first. After plugging in your USB, you should be identify it by running the command below. It will be less of a headache if you perform all these operations as root (via `sudo` or via `su -`). Your USB device will likely be at the bottom of the STDOUT and will resemble something like the following:
+Before diving in, it is good practice to format your USB device first. After plugging in your USB, you should be identify it by running the command below. It will be less of a headache if you perform all these operations as root (via `su -` or `sudo`). Your USB device will likely be at the bottom of the STDOUT and will resemble something like the following:
 
 ```sh
   $ fdisk -l
