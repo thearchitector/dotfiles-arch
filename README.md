@@ -3,7 +3,7 @@
 ## Contents
 1. [Overview](#overview)
 2. [Getting Started](#getting-started)
-3. [Partioning and LVM setup](#partitioning-and-lvm-setup)
+3. [Disk setup](#disk-setup)
 4. [GRUB installation](#installing-grub)
 5. [Display/Window managers](#display-and-window-managers)
 
@@ -50,7 +50,32 @@ Once you've downloaded the ISO, you can easily burn it to your USB device using 
     682622976 bytes (683 MB, 651 MiB) copied, 24.145 s, 28.3 MB/s
 ```
 
-## Partitioning and LVM setup
+## Disk setup
+Once you have a bootable ISO USB, you can restart your computer and boot into it manually through your manual boot menu. The ISO should automatically login as root and you should be placed in the root user's home directory. You can verify this is the case by running `ls` and checking if there is a file called `install.txt`.
+
+### Configuring Wi-Fi
+You may run into a situation where you need to connect to the internet to successfully complete installation. To connect to Wi-Fi, run the following command. It will poll for avaliable devices and networks, and then open a UI prompting you to select a network and enter its connection credentials.
+
+```sh
+  $ wifi-menu
+```
+
+After entering credentials, you can verify that a connection has been established by pinging a known website. If successful, `ping` should report recieving 64-byte packets from your hostname:
+
+```sh
+  $ ping 1.1.1.1
+  PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data.
+  64 bytes from 1.1.1.1: icmp_seq=1 ttl=59 time=17.6 ms
+  64 bytes from 1.1.1.1: icmp_seq=2 ttl=59 time=23.3 ms
+
+  --- 1.1.1.1 ping statistics ---
+  3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+```
+
+### Partitioning
+To install Arch Linux, there must be allocated free space on some internal SSD/HDD. This installation guide will not go into how to shrink or delete existing partitions, but I recommend at least 100GiB as anything less than that starts to yield funky and unexpected failures when dealing with programs like Anaconda (https://www.anaconda.com/distribution/) and Docker (https://docs.docker.com/install/).
+
+### Setting up LVM
 
 ## Installing GRUB
 
