@@ -69,11 +69,52 @@ After entering credentials, you can verify that a connection has been establishe
   64 bytes from 1.1.1.1: icmp_seq=2 ttl=59 time=23.3 ms
 
   --- 1.1.1.1 ping statistics ---
-  3 packets transmitted, 3 received, 0% packet loss, time 2004ms
+  2 packets transmitted, 2 received, 0% packet loss, time 2004ms
 ```
 
 ### Partitioning
 To install Arch Linux, there must be allocated free space on some internal SSD/HDD. This installation guide will not go into how to shrink or delete existing partitions, but I recommend at least 100GiB as anything less than that starts to yield funky and unexpected failures when dealing with programs like Anaconda (https://www.anaconda.com/distribution/) and Docker (https://docs.docker.com/install/).
+
+#### Allocating the filesystem
+In order to use the avaliable space on your internal storage device, you must allocate that space to a partition. _Please note that you should already know the physical device onto which you are going to install Arch. In this tutorial that device is `/dev/nvme0n1`, but it will almost certainly be different on your machine._
+
+To initialize the partitioning, we can again use the `fdisk` command:
+
+```sh
+  $ fdisk /dev/nvme0n1
+```
+
+A new subshell will open prompting you to enter `fdisk`-specific commands. You can check the list of commands and their descriptions by entering `m`. As we want to create a new partition, we can simply follow the default process and leave all the default values unchanged:
+
+```sh
+  Command (m for help): n
+  Partition number (5-128, default 5): 5
+  First sector (532828020-1000215182, default 532828020): 532828020
+  Last sector, +/-sectors or +/-size{K,M,G,T,P} (532828020-1000215182, default 1000215182): 1000215182
+  
+  Created new partition 5 of type 'Linux filesystem' and of size 222.9 GiB.
+```
+
+Note that `fdisk` mentions that it new partition will be created with the type 'Linux filesystem'. In most cases that is totally fine, as it would allow you to allocate the space using any UNIX filesystem like ext3 or ext4. However we intend on separating our Linux filesystem from the physical storage device with a layer known as LVM (Logical Volume Manager), the hope being that it will make our lives significantly easier if something goes wrong in the future. I highly recommend you read more about the design principles and reasoning behind LVM here (https://wiki.archlinux.org/index.php/LVM#Background).
+
+Continuing, we need to specify that the new partition we're making does not use a standard Linux filesystem directly. Rather, it uses a special bridge partition type called 'Linux LVM'. `fdisk` allows you to modify the type of partition it will make using the `t` subcommand:
+
+```sh
+  Command (m for help): t
+  Partition number (1-5, default 5): 5
+  Partition type (type L to list all types): 30
+  
+  Changed type of partition 'Linux filesystem' to 'Linux LVM'.
+```
+
+The last step in partitioning is to tell `fdisk` to actually make the changes. You can do that with the `w` (write table to disk) subcommand:
+
+```sh
+  Command (m for help): w
+  The partition table has been altered.
+  Calling ioctl() to re-read partition table.
+  Syncing disks.
+```
 
 ### Setting up LVM
 
