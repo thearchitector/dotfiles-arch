@@ -196,7 +196,7 @@ First, we need to make sure we mount all the volumes on which we intend to write
   $ mount /dev/vpool/home /mnt/home
   $ mount /dev/nvme0n1p2 /mnt/boot
   $ swapon /dev/vpool/swap
-  $ pacstrap /mnt base linux linux-firmware lvm2
+  $ pacstrap /mnt base linux linux-firmware lvm2 vim
 ```
 
 The latter command, depending on your internet speed, will take a while to complete. Sit back, relax, and have a drink.
