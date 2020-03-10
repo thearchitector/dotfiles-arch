@@ -203,11 +203,9 @@ The latter command, depending on your internet speed, will take a while to compl
 
 ## Configuring your Installation
 
-genfstab -U /mnt >> /mnt/etc/fstab  
+genfstab -U /mnt >> /mnt/etc/fstab
 
-arch-chroot /mnt  
-pacman -Sy  
-pacman -S vim  
+arch-chroot /mnt
 
 ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime  
 hwclock --systohc  
@@ -217,7 +215,9 @@ vim /etc/locale.gen
 locale-gen  
 
 vim /etc/mkinitcpio.conf  
-  edit HOOKS to include `lvm2` module (https://wiki.archlinux.org/index.php/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)   
+  - edit HOOKS to include `lvm2` module (https://wiki.archlinux.org/index.php/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)
+  - uncomment `COMPRESSION=xz`
+  - add `-e` flag to `COMPRESSION_OPTIONS`
 mkinitcpio -P  
 passwd  
 
@@ -229,7 +229,5 @@ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchLinux
 vim /etc/default/grub
   edit timeout to -1
   add `lvm` to end of preload modules
-
-
 
 ## Display and Window Managers
