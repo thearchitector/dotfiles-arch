@@ -158,7 +158,25 @@ You can create all these logical volumes in a few short and templated commans, w
     Logical volume "home" created.
 ```
 
-After creating the `swap` volume, Linux needs to know to use it as its swap space. You can do so using `mkswap` and the new mapped drive path:
+### Setting the filesystems
+Now that the logical volumes have been made, we need to "install" the appopriate filesystems onto each of them. I opt for ext4 (https://en.wikipedia.org/wiki/Ext4), as it is allegedly faster and can support larger filesizes, but ext3 (https://en.wikipedia.org/wiki/Ext3) works just as well (and perhaps even more stably).
+
+```sh
+  $ mkfs.ext4 /dev/vpool/root
+  mke2fs 1.45.5 (07-Jan-2020)
+  Discarding device blocks: done
+  ...
+  Writing superblocks and filesystem accounting information: done
+  
+  $ mkfs.ext4 /dev/vpool/home
+  mke2fs 1.45.5 (07-Jan-2020)
+  Discarding device blocks: done
+  ...
+  Writing superblocks and filesystem accounting information: done
+```
+
+#### Swap
+Swap is tricky, as it has a specialized file structure different from standards like ext4 and ext2. The process is, however, no more complicated:
 
 ```sh
   $ mkswap /dev/vpool/swap
@@ -166,8 +184,12 @@ After creating the `swap` volume, Linux needs to know to use it as its swap spac
   no label, UUID=...
 ```
 
-### Setting the filesystems
+## Installing the Essentials
+You now have fully functional logical volumes to use with Arch Linux. Congratulations! Now we can mount the drive, install the Linux kernel, device firmware, and the other utilities deemed essential for function. We can do both of those with the beloved `mount` and `pacstrap` command, which will download and install all the provided packages and package groups to the specified drive location.
 
+```sh
+  $ mount /dev/vpool/root /mnt
+```
 
 ## Installing GRUB
 
