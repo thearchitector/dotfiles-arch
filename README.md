@@ -230,4 +230,8 @@ vim /etc/default/grub
   edit timeout to -1
   add `lvm` to end of preload modules
 
+install the proper microcode (https://wiki.archlinux.org/index.php/Microcode)
+
+grub-mkconfig -o /boot/grub/grub.cfg
+
 ## Display and Window Managers
