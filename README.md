@@ -158,6 +158,17 @@ You can create all these logical volumes in a few short and templated commans, w
     Logical volume "home" created.
 ```
 
+After creating the `swap` volume, Linux needs to know to use it as its swap space. You can do so using `mkswap` and the new mapped drive path:
+
+```sh
+  $ mkswap /dev/vpool/swap
+  Setting up swapspace version 1, size = 20 GiB (21474832384 bytes)
+  no label, UUID=...
+```
+
+### Setting the filesystems
+
+
 ## Installing GRUB
 
 ## Display and Window Managers
