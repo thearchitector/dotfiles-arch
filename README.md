@@ -8,7 +8,7 @@
 5. [Display/Window managers](#display-and-window-managers)
 
 ## Overview
-This repoistory contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities.
+This repoistory contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities. **There are many different ways you can choose to setup your own machine, and I am not claiming that my way is the best way for you. Several factors have gone into the procedure outlined below, so if it does not fit your beliefs or needs simply don't follow it.**
 
 ## Getting Started
 ### Formatting your USB
@@ -95,9 +95,11 @@ A new subshell will open prompting you to enter `fdisk`-specific commands. You c
   Created new partition 5 of type 'Linux filesystem' and of size 222.9 GiB.
 ```
 
-Note that `fdisk` mentions that it new partition will be created with the type 'Linux filesystem'. In most cases that is totally fine, as it would allow you to allocate the space using any UNIX filesystem like ext3 or ext4. However we intend on separating our Linux filesystem from the physical storage device with a layer known as LVM (Logical Volume Manager), the hope being that it will make our lives significantly easier if something goes wrong in the future. I highly recommend you read more about the design principles and reasoning behind LVM here (https://wiki.archlinux.org/index.php/LVM#Background).
+<img align="right" width=450 src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Lvm.svg">
 
-Continuing, we need to specify that the new partition we're making does not use a standard Linux filesystem directly. Rather, it uses a special bridge partition type called 'Linux LVM'. `fdisk` allows you to modify the type of partition it will make using the `t` subcommand:
+Note that `fdisk` mentions that it new partition will be created with the type 'Linux filesystem'. In most cases that is totally fine, as it would allow you to allocate the space using any UNIX filesystem like ext3 or ext4. However we intend on separating our Linux filesystem from the physical storage device with a layer known as LVM (Logical Volume Manager), the hope being that it will make our lives significantly easier if something goes wrong in the future. I highly recommend you read more about the design principles and reasoning behind LVM here (https://wiki.archlinux.org/index.php/LVM#Background), but you can get a general concept of how things are arranged by the diagram on the right. 
+
+Continuing, we need to specify that the new partition we're making does not use a standard Linux filesystem directly. Rather, it uses a special bridge partition type called 'Linux LVM'. In the diagram above, this is the 'Physical Partition'. `fdisk` allows you to modify the type of partition it will make using the `t` subcommand:
 
 ```sh
   Command (m for help): t
@@ -117,6 +119,44 @@ The last step in partitioning is to tell `fdisk` to actually make the changes. Y
 ```
 
 ### Setting up LVM
+Now that the physical partition set, we can go ahead and continue to setup our different LVM abstraction layers. In this tutorial, the physical partition that was made is named `/dev/nvme0n1p5`, but will be different on your machine. **Make sure to change update your commands to respect that fact.**
+
+#### Physical Volume
+Looking at the diagram above, the second layer of abstraction that we must make is called a 'Physical Volume'. We can check that none exist by running `pvscan`, and then make one using `pvcreate`:
+
+```sh
+  $ pvscan
+      No matching physical volumes found
+  $ pvcreate /dev/nvme0n1p5
+      Physical volume "/dev/nvme0n1p5" was successfully created.
+  $ pvscan
+      PV /dev/nvme0n1p5                       lvm2 [<222.87 GiB]
+      ...
+```
+
+#### Volume Group
+Next is the 'Volume Group'. Its job is to manage the allocated space across many different physical volumes and physical partitions. In essence, this is where the magic happens. A single volume group can control many different sectors of physical devices, effectively making a larger and dynamic drive. In this way, LVM is very similar to RAID. You can make a 'Volume Group' using the `vgcreate` command:
+
+```sh
+  $ vgcreate vpool /dev/nvme0n1p5
+      Volume group "vpool" successfully created
+```
+
+#### Logical Volumes
+If you are familiar with normal disk partitioning, this step will make a lot of sense as it is conceptually identical to creationg specialized partitions on a physical drive. On a familiar Linux system, these likely include the root partition `/`, the home parition `/home`, and the swap partition.
+
+The amount of space you allocate for each of these volumes is up to you and is likely dictated by your needs and hardware. My personal approach is to always set the root (`/`) partition to 64 GiB, swap to some size related to my systems RAM, and home (`/home`) to the rest. There is a substantial amount of confusion and disagreement about what to make the size of your `swap` partition. In general I tend to follow the chart created by the folks over at Ubuntu (https://help.ubuntu.com/community/SwapFaq#How_much_swap_do_I_need.3F), and I suggest you do the same.
+
+You can create all these logical volumes in a few short and templated commans, where the `-L` option indicates size, `-n` indicates the name of the volume, and the last argument indicates the volume group in which to create it. After creating the volumes, I suggest you make sure everything looks correct using the `lvdisplay` command.
+
+```sh
+  $ lvcreate -L 64G -n root vpool
+    Logical volume "root" created.
+  $ lvcreate -L 20G -n swap vpool
+    Logical volume "swap" created.
+  $ lvcreate -l 100%FREE -n home vpool
+    Logical volume "home" created.
+```
 
 ## Installing GRUB
 
