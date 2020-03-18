@@ -187,16 +187,33 @@ Swap is tricky, as it has a specialized file structure different from standards 
 ## Installing the Essentials
 You now have fully functional logical volumes to use with Arch Linux. Congratulations! Now we can mount the drive, install the Linux kernel, device firmware, and the other utilities deemed essential for function. We can do both of those with the beloved `mount` and `pacstrap` command, which will download and install all the provided packages and package groups to the specified drive location.
 
-First, we need to make sure we mount all the volumes on which we intend to write and save data. If we don't, we might end up installing critical files to location that will get overwritten later. **This is bad - I can speak from experience.**
+### Creating a better mirrorlist
+The order of your mirrorlist, which is simply the list of URLs from which `pacman` can download packages, can be a major problem. If you choose to ignore the mirrorlist and just go on installing Arch, you might find that `pacman` downloads are painfully slow. By default, the `pacman` mirrorlist contains a huge number of possible servers, but they might not be ordered best for your location and country. Thankfully, someone thought of this problem and created the `reflector` package, which essentially pings a list of known mirrors in your country and orders them by download speed. That way, we can be sure we're using the most up-to-date mirrors in the best possible order.
+
+```sh
+  $ pacman -Syy
+  $ pacman -S reflector
+```
+
+As a saftey precaution, it is generally always a good idea to make a backup of critical files before modifying them. In this case, we want to make a backup of `/etc/pacman.d/mirrorlist` before we overwrite it. Then we can continue and create our new mirrorlist, making sure to update the country for your location:
+
+```sh
+  $ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.old
+  $ reflector -c US -f 12 -l 12 --sort rate --protocol https --threads $(nproc) --verbose --save /etc/pacman.d/mirrorlist
+  /root.cache/mirrorstatus.json
+  ...
+```
+
+### Mounting and installing
+Now we need to make sure we mount all the volumes on which we intend to write and save data. If we don't, we might end up installing critical files to locations that will get overwritten later. **This is bad - I can speak from experience.** Once done, we can continue and actuall install the Arch essential packages (plus a few) to your new system.
 
 ```sh
   $ mount /dev/vpool/root /mnt
-  $ mkdir /mnt/home
-  $ mkdir /mnt/boot
+  $ mkdir /mnt/home /mnt/boot
   $ mount /dev/vpool/home /mnt/home
   $ mount /dev/nvme0n1p2 /mnt/boot
   $ swapon /dev/vpool/swap
-  $ pacstrap /mnt base linux linux-firmware lvm2 vim
+  $ pacstrap /mnt base linux linux-firmware lvm2 vim sudo
 ```
 
 The latter command, depending on your internet speed, will take a while to complete. Sit back, relax, and have a drink.
@@ -207,23 +224,23 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt
 
-ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime  
-hwclock --systohc  
+vim /etc/locale.gen
+  - uncomment your locale - usually en_US.UTF-8 UTF-8
 
-vim /etc/locale.gen  
-  uncomment your locale - usually en_US.UTF-8 UTF-8  
 locale-gen  
 
-vim /etc/mkinitcpio.conf  
+vim /etc/mkinitcpio.conf
   - edit HOOKS to include `lvm2` module (https://wiki.archlinux.org/index.php/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)
   - uncomment `COMPRESSION=xz`
   - add `-e` flag to `COMPRESSION_OPTIONS`
-mkinitcpio -P  
+
+mkinitcpio -P
+
 passwd  
 
 ## Installing GRUB
 
-pacman -S grub efibootmgr  
+pacman -S grub efibootmgr os-prober  
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchLinux  
 
 vim /etc/default/grub
@@ -234,4 +251,26 @@ install the proper microcode (https://wiki.archlinux.org/index.php/Microcode)
 
 grub-mkconfig -o /boot/grub/grub.cfg
 
+## Connecting to a Network
+
+pacman -S networkmanager
+
+reboot into the installed system
+
+systemctl enable NetworkManager.service
+systemctl start NetworkManager.service
+
+nmcli device wifi list
+
+nmcli device wifi connect _SSID_ password _password_
+
+test with ping 1.1.1.1
+
+## Creating your admin user
+
+as root `EDITOR=vim visudo`
+- uncomment the wheel group line `%wheel ALL=(ALL) ALL` to enable the wheel group
+
 ## Display and Window Managers
+
+pacman -S xorg-xinit bspwm
