@@ -199,7 +199,7 @@ As a saftey precaution, it is generally always a good idea to make a backup of c
 
 ```sh
   $ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.old
-  $ reflector -c US -f 12 -l 12 --sort rate --protocol https --threads $(nproc) --verbose --save /etc/pacman.d/mirrorlist
+  $ reflector -c US -f 12 -l 12 --sort rate --protocol https --protocol http --threads $(nproc) --verbose --save /etc/pacman.d/mirrorlist
   /root.cache/mirrorstatus.json
   ...
 ```
@@ -213,7 +213,7 @@ Now we need to make sure we mount all the volumes on which we intend to write an
   $ mount /dev/vpool/home /mnt/home
   $ mount /dev/nvme0n1p2 /mnt/boot
   $ swapon /dev/vpool/swap
-  $ pacstrap /mnt base linux linux-firmware lvm2 vim sudo
+  $ pacstrap /mnt base linux linux-firmware lvm2 neovim
 ```
 
 The latter command, depending on your internet speed, will take a while to complete. Sit back, relax, and have a drink.
@@ -236,14 +236,18 @@ vim /etc/mkinitcpio.conf
 
 mkinitcpio -P
 
-passwd  
+passwd
+
+install your shell, i highly recommend fish because
+
+pacman -S fish
 
 ## Installing GRUB
 
 pacman -S grub efibootmgr os-prober  
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchLinux  
 
-vim /etc/default/grub
+nvim /etc/default/grub
   edit timeout to -1
   add `lvm` to end of preload modules
 
@@ -252,13 +256,13 @@ install the proper microcode (https://wiki.archlinux.org/index.php/Microcode)
 grub-mkconfig -o /boot/grub/grub.cfg
 
 ## Connecting to a Network
+many network managers but this is the easiest
 
 pacman -S networkmanager
 
-reboot into the installed system
-
 systemctl enable NetworkManager.service
-systemctl start NetworkManager.service
+
+reboot into the installed system
 
 nmcli device wifi list
 
@@ -266,11 +270,53 @@ nmcli device wifi connect _SSID_ password _password_
 
 test with ping 1.1.1.1
 
+## Setting custom DNS servers
+good idea to set custom DNS servers so that it doesn't fallback to your gateway --> faster?
+
+nvim /etc/NetworkManager/system-connections/{WHICHEVER IS FAMILIAR}
+
+under [ipv4]
+```
+dns=1.1.1.1;1.0.0.1
+ignore-auto-dns=true
+method=auto
+```
+
+under [ipv6]
+```
+dns=2606:4700:4700::1.1.1.1;2606:4700:4700::1.0.0.1
+ignore-auto-dns=true
+method=auto
+```
+
 ## Creating your admin user
+using a lightweight alternative to `sudo`. it does 95% of what `sudo` does but with a much smaller and efficient codebase
 
-as root `EDITOR=vim visudo`
-- uncomment the wheel group line `%wheel ALL=(ALL) ALL` to enable the wheel group
+pacman -S opendoas
 
-## Display and Window Managers
+echo "permit persist keepenv :wheel" > /etc/doas.conf
 
-pacman -S xorg-xinit bspwm
+ln -sv /etc/bin/doas /etc/bin/sudo
+
+useradd -m -G wheel -s /usr/bin/fish egabriel
+
+passwd egabriel
+
+su egabriel
+
+## Installing an AUR helper
+definetly don't use `yaourt`, it's outdated, unmaintained, and has several security and functionality issues (https://github.com/archlinuxfr/yaourt/issues/382)
+
+i recommend pikaur (https://github.com/actionless/pikaur#pikaur), but realistically they're all going to do the same thing
+
+doas pacman -S fakeroot binutils make git gcc
+
+```sh
+  $ git clone https://aur.archlinux.org/pikaur.git /tmp/pikaur
+  $ cd /tmp/pikaur
+  $ makepkg -fsri
+```
+
+## Window Managers
+
+pikaur -S xorg-server xorg-xinit sxhkd picom alicritty bspwm polybar siji-git
