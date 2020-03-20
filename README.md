@@ -319,4 +319,4 @@ doas pacman -S fakeroot binutils make git gcc
 
 ## Window Managers
 
-pikaur -S xorg-server xorg-xinit sxhkd picom alicritty bspwm polybar siji-git
+pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom dunst terminus-font termite sxhkd
