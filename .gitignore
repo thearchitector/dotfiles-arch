@@ -1,0 +1,10 @@
+
+# Ignore everything as a catch-all
+/*
+
+# Whitelist Git essentials and system configuration files
+!README.md
+!.gitignore
+!.xinitrc
+!.config/
+!.git/

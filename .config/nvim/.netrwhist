@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =5
+let g:netrw_dirhist_5='/home/egabriel/.config'
+let g:netrw_dirhist_4='/home/egabriel'
+let g:netrw_dirhist_3='/home/egabriel/.config/bspwm'
+let g:netrw_dirhist_2='/home/egabriel/.config'
+let g:netrw_dirhist_1='/home/egabriel'
+let g:netrw_dirhist_0='/home/egabriel'
+let g:netrw_dirhist_9='/home/egabriel/.config/bspwm'
+let g:netrw_dirhist_8='/home/egabriel/.config'
+let g:netrw_dirhist_7='/home/egabriel'
+let g:netrw_dirhist_6='/home/egabriel/.config/termite'
