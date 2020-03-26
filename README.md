@@ -296,7 +296,7 @@ pacman -S opendoas
 
 echo "permit persist keepenv :wheel" > /etc/doas.conf
 
-ln -sv /etc/bin/doas /etc/bin/sudo
+ln -sv /usr/bin/doas /usr/bin/sudo
 
 useradd -m -G wheel -s /usr/bin/fish egabriel
 
@@ -319,4 +319,4 @@ doas pacman -S fakeroot binutils make git gcc
 
 ## Window Managers
 
-pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom dunst terminus-font termite sxhkd
+pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom dunst termite sxhkd otf-font-awesome
