@@ -270,25 +270,6 @@ nmcli device wifi connect _SSID_ password _password_
 
 test with ping 1.1.1.1
 
-## Setting custom DNS servers
-good idea to set custom DNS servers so that it doesn't fallback to your gateway --> faster?
-
-nvim /etc/NetworkManager/system-connections/{WHICHEVER IS FAMILIAR}
-
-under [ipv4]
-```
-dns=1.1.1.1;1.0.0.1
-ignore-auto-dns=true
-method=auto
-```
-
-under [ipv6]
-```
-dns=2606:4700:4700::1.1.1.1;2606:4700:4700::1.0.0.1
-ignore-auto-dns=true
-method=auto
-```
-
 ## Creating your admin user
 using a lightweight alternative to `sudo`. it does 95% of what `sudo` does but with a much smaller and efficient codebase
 
@@ -317,6 +298,10 @@ doas pacman -S fakeroot binutils make git gcc
   $ makepkg -fsri
 ```
 
-## Window Managers
+## Customization
 
-pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom dunst termite sxhkd otf-font-awesome
+pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom termite sxhkd otf-font-awesome
+
+git clone https://github.com/thearchitector/dotfiles-arch
+
+move `.config` and `.xinitrc` into home directory

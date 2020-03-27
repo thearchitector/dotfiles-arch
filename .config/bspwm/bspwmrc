@@ -6,16 +6,14 @@ bspc config border_width           2
 bspc config window_gap             12
 
 bspc config split_ratio            0.5
-bspc config borderless_monocle     true
+bspc config borderless_monocle     false
 bspc config single_monocle 	       true
 
 bspc config normal_border_color    "#19191C"
 bspc config focused_border_color   "#202026"
 
-killall -9 sxhkd polybar picom dunst
+killall -9 sxhkd polybar picom
 sxhkd &
 $HOME/.config/polybar/launch.sh &
 picom &
-dunst &
-pulseaudio &
-feh --bg-max $(find ~/.config/feh -type f | shuf -n 1) &
+feh $(find ~/.config/feh -type f | shuf -n 1) --no-fehbg --no-xinerama --bg-max &

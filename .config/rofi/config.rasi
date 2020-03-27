@@ -1,82 +1,114 @@
-/* Theme made by:
-https://github.com/WillPower3309
-*/
+/*
+ * Material ROFI color theme
+ *
+ * Copyright (c) Tomas Zaluckij
+ * Modifications by Elias Gabriel
+ */
 
 configuration {
-    modi: 		            "drun";
-    display-drun:                   "Apps";
-    display-window:                 "Window";
-    show-icons:true;
+  show-icons: true;
+  display-drun: "run";
 }
- 
+
 * {
-    lines: 15;
-    columns: 1;
-    background-color: #161821;
-    border-color: #00000000;
-    text-color: #EFEFEF;
-    font: "Source Sans Pro 16";
+	base00: #263238;
+	base01: #2E3C43;
+	base02: #314549;
+	base03: #546E7A;
+	base04: #B2CCD6;
+	base05: #EEFFFF;
+	base06: #EEFFFF;
+	base07: #FFFFFF;
+	base08: #F07178;
+	base09: #F78C6C;
+	base0A: #FFCB6B;
+	base0B: #C3E88D;
+	base0C: #89DDFF;
+	base0D: #82AAFF;
+	base0E: #C792EA;
+	base0F: #FF5370;
+
+	spacing: 0;
+	background-color: transparent;
+
+	font: "Roboto Mono 13";
 }
- 
-#window {
-    border: 0;
-    border-radius: 4px;
-    padding: 40;
-    width: 30%;
-    height: 45%;
+
+window {
+	transparency: "real";
+	background-color: #263238CC;
 }
- 
-#mainbox {
-    background-color: #00000000;
-    children: [inputbar, listview];
-    spacing: 10px;
-    padding: 30px 0;
+
+mainbox {
+	children: [inputbar, message, listview];
+	spacing: 30px;
+	padding: 30px 0;
+	border: 1px;
+	border-color: @base0D;
 }
- 
- 
-#listview {
-    background-color: #00000000;
-    fixed-height: 0;
-    border: 0px;
-    spacing: 5px;
-    scrollbar: false;
-    padding: 10px 10px 0px;
+
+inputbar {
+	padding: 0 30px;
+	children: [prompt, textbox-prompt-colon, entry];
 }
- 
-#element {
-    background-color: #00000000;
-    border: 0;
-    border-radius: 15px;
-    padding: 3 0  3 4 ;
+
+prompt {
+	text-color: @base0D;
 }
- 
-#element selected {
-    background-color: #266dd3;
-    text-color: #EFEFEF;
+
+textbox-prompt-colon {
+	expand: false;
+	str: ":";
+	margin: 0 1ch 0 0;
+	text-color: @base0D;
 }
- 
- 
-#inputbar {
-    children:   [ prompt,textbox-prompt-colon,entry,case-indicator ];
-    background-color: #00000000;
+
+entry {
+	text-color: @base07;
 }
- 
-#case-indicator {
-    background-color: #00000000;
-    spacing:    0;
+
+message {
+	border: 1px 0;
+	border-color: @base0D;
 }
-#entry {
-    background-color: #00000000;
-    spacing:    0;
+
+listview {
+	scrollbar: true;
+	margin: 0 10px 0 30px;
 }
-#prompt {
-    background-color: #00000000;
-    spacing:    0;
+
+scrollbar {
+	background-color: @base03;
+	handle-color: @base0D;
+	handle-width: 10px;
+	border: 0 1px;
+	border-color: @base0D;
+	margin: 0 0 0 20px;
 }
- 
-#textbox-prompt-colon {
-    background-color: #00000000;
-    expand:     false;
-    str:        ":";
-    margin:     0px 0.3em 0em 0em ;
+
+element {
+	padding: 5px;
+	highlight: bold underline;
 }
+
+element normal {
+	background-color: transparent;
+}
+
+element selected {
+	background-color: @base0D;
+}
+
+element normal normal, element selected normal, element alternate normal {
+	text-color: @base07;
+}
+
+element normal urgent, element selected urgent, element alternate urgent {
+	text-color: @base0F;
+}
+
+element normal active, element selected active, element alternate active {
+	text-color: @base0B;
+}
+
+/* vim:ft=css

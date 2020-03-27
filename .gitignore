@@ -7,4 +7,6 @@
 !.gitignore
 !.xinitrc
 !.config/
-!.git/
+
+.config/pulse
+.config/dconf
