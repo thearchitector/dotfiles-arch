@@ -17,3 +17,15 @@ alt + Tab
 # switch desktops
 super + {1-9}
   bspc desktop --focus \^{1-9}
+
+# raise volume
+XF86AudioRaiseVolume
+  amixer --quiet set Master 1%+
+
+# lower volume
+XF86AudioLowerVolume
+  amixer --quiet set Master 1%-
+
+# mute sound
+XF86AudioMute
+  amixer --quiet set Master toggle

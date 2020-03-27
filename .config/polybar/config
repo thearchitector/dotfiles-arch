@@ -108,7 +108,7 @@ label = %time% %date%
 
 
 [module/volume]
-type = internal/pulseaudio
+type = internal/alsa
 
 use-ui-max = false
 format-volume = <ramp-volume> <label-volume>
