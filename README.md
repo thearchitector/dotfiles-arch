@@ -8,7 +8,7 @@
 5. [Display/Window managers](#display-and-window-managers)
 
 ## Overview
-This repoistory contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities. **There are many different ways you can choose to setup your own machine, and I am not claiming that my way is the best way for you. Several factors have gone into the procedure outlined below, so if it does not fit your beliefs or needs simply don't follow it.**
+This repoistory contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch on a duel-booted machine. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities. **There are many different ways you can choose to setup your own machine, and I am not claiming that my way is the best way for you. Several factors have gone into the procedure outlined below, so if it does not fit your beliefs or needs simply don't follow it.**
 
 ## Getting Started
 ### Formatting your USB
@@ -216,44 +216,90 @@ Now we need to make sure we mount all the volumes on which we intend to write an
   $ pacstrap /mnt base linux linux-firmware lvm2 neovim
 ```
 
-The latter command, depending on your internet speed, will take a while to complete. Sit back, relax, and have a drink.
+The latter command, depending on your internet speed, might take a while to complete. Sit back, relax, and have a drink.
 
-## Configuring your Installation
+## Preparing your System
+To make you life easier, we can tell Linux to automatically mount all of our drives every time we boot into Arch. That way, we can avoid having to manually mount your drives every time we want to do something. Linux makes use of a filed called `fstab` to autoremount drives at startup. Rather than manually listing our desired drives, we can export the current mount configuration directly to that file using `genfstab`. Since we had to mount all your drives to install the essentials above, we can simply export the current configuration.
 
-genfstab -U /mnt >> /mnt/etc/fstab
+```sh
+  $ genfstab -U /mnt >> /mnt/etc/fstab
+```
 
-arch-chroot /mnt
+Once we've done that, we can `chroot` directly into our new installation. `chroot` changes the current working root directory from one folder to another. While this does not alter the programs that are currently running in the background (like `netctl`, which we started using `wifi-menu`), it ensures that any future changes we make to the filesystem will be relative to the new root rather than the current root (which is on our bootable ISO USB). In effect, any changes we make to your system after `chroot`-ing will be made to your permanent installation.
 
-vim /etc/locale.gen
-  - uncomment your locale - usually en_US.UTF-8 UTF-8
+```sh
+  $ arch-chroot /mnt
+```
 
-locale-gen  
+At this point, it's a good idea to tell your OS what language you will be working in. I natively speak American English, so that is the lanuage my system is set to use. However, you can enable and disable any of the default locales and languages depending on what you speak and prefer. Generally locale codes follow the format `language[_territory][.codeset]`, where `language` is an ISO 639-1 code (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes), `territory` is an ISO 3166 country code (https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes), and `codeset` is a character encoding scheme.
 
-vim /etc/mkinitcpio.conf
-  - edit HOOKS to include `lvm2` module (https://wiki.archlinux.org/index.php/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)
-  - uncomment `COMPRESSION=xz`
-  - add `-e` flag to `COMPRESSION_OPTIONS`
+My system is configured to use American English encoded using UTF-8. Following the format above that translates to `en_US.UTF-8`, where `en` stands for "English", `US` stands for "United States", and `UTF-8` stands for itself. In order to change your own system's locale, you can simply edit the `/etc/locale.gen` file and uncomment whichever locale you desire. Once you've done that, you can regenerate all your system's text using `locale-gen`.
 
-mkinitcpio -P
+```sh
+  $ nvim /etc/locale.gen
+  $ locale-gen
+  Generating locales...
+    en_US.UTF-8... done
+  Generation complete.
+```
 
-passwd
+### Generating initial ramdisks
 
-install your shell, i highly recommend fish because
+> **The descriptions below are a large simiplication of a very complex and interconnected system. They are likely not 100% factual and thus serve only as a proxy for high-level understanding.**
 
-pacman -S fish
+A key step in the boot cycle for any operating system involves loading programs and files necessary for the kernel to function. Without those files, the OS kernel might not have the knowledge or access to the resources required to load critical information from disk. On Linux, for example, hardware device drivers and information are needed to find, and then load, the root `/` filesystem. Rather than manually coding a myriad of special cases into the generically-distributed Linux kernel, each installation creates an "early user space" that contains all the information about your environment's setup so that the kernel can successfully load your system's root filesystem. If you'd like to know more, I recommend reading the Wikipedia article on the Linux startup process (https://en.wikipedia.org/wiki/Linux_startup_process) and the initial ramdisk scheme (https://en.wikipedia.org/wiki/Initial_ramdisk).
+
+On your machine, `mkinitcpio` is responsible for generating the initial ramdisk files for your system. Whenever the Linux kernel or other essential packages are updated, it regenerates the required boot files. As we setup your system to make use of LVM, your root filesystem is located on an a logical volume that is not directly readable by your kernel. As you can imagine, this means that in order for the kernel to mount your root directory your "early user space" needs to know how to navigate the LVM directory structure. Fortunately, all of that information is packaged into a loading "module", which can be injected into your "early user space". To enable the LVM module, we need to edit the `mkinitcpio` configuration file and include the `lvm2` module between the `block` and `filesystem` entries on the `HOOKS` line.
+
+```sh
+  $ nvim /etc/mkinitcpio.conf
+  
+  --------
+  
+  HOOKS=(base udev ... block lvm2 filesystems)
+```
+
+To more efficiently use your disk space, you can also enable compression of the generated files. This step is optional, but I recommend it if you are low of usable disk space. The method with the highest compression ratio is `xz`, which is an implementation of the LZMA2 compression algorithm. To enable it, simply uncomment `COMPRESSION=xz` and uncomment `COMPRESSION_OPTIONS` while `-e` to the list. 
+
+Finally, regenrate your `initramfs` files by running `mkinitcpio -P`.
 
 ## Installing GRUB
+In order to boot into your installation, you need a boot loader. A boot loader is what is found by your computer's BIOS or UEFI on startup, and is what points your computer to OS loading files. I recommend GRUB 2 because is easy to setup, customizable, and versatile, but there are many other options you can choose from if you so desire (https://en.wikipedia.org/wiki/Comparison_of_boot_loaders). The installation procedure is different depending on if your system is BIOS-based or UEFI-based, so follow the options for your system:
 
-pacman -S grub efibootmgr os-prober  
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=ArchLinux  
+### BIOS-based
+**NOTE: Remember to change the drive containing your boot system, as it is very unlikely to be `/dev/nvme0n2`.**
 
-nvim /etc/default/grub
-  edit timeout to -1
-  add `lvm` to end of preload modules
+```sh
+  $ pacman -S grub os-prober
+  $ grub-install --target=$(uname -m) --bootload-id="Arch Linux" /dev/nvme0n2
+```
 
-install the proper microcode (https://wiki.archlinux.org/index.php/Microcode)
+### UEFI-based
 
-grub-mkconfig -o /boot/grub/grub.cfg
+```sh
+  $ pacman -S grub efibootmgr os-prober  
+  $ grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id="Arch Linux"
+```
+
+After installing GRUB, you can configure it by editing the default configuration file via `nvim /etc/default/grub`. On my machine, I set `GRUB_TIMEOUT=-1` to prevent the autobooting into any OS. Besides any other configuration you do, make sure to add `lvm` to the end of `GRUB_PRELOAD_MODULES`.
+
+While not necessary, I also recommend you install the proper microcode for your given system. Microcode is similar to CPU firmware, and is an abstraction above hardware-specific processs. Companies often release security patches and bug fixes to their CPUs' microcodes, so it is a good idea to install the latest release and allow GRUB to load it during boot time. As the microcode package you install differs depending on your physical system, I suggest you take a look at the official wiki page for more information (https://wiki.archlinux.org/index.php/Microcode). However, most systems will fall under one of the following two choices:
+
+#### Intel
+```sh
+  $ pacman -S intel-ucode
+```
+
+#### AMD
+```sh
+  $ pacman -S amd-ucode
+```
+
+Finally, you just need to tell GRUB to regenerate it's startup script. It will automatically include your installed microcode package as well as any changes you made in `/etc/default/grub`.
+
+```sh
+  $ grub-mkconfig -o /boot/grub/grub.cfg
+```
 
 ## Connecting to a Network
 many network managers but this is the easiest
