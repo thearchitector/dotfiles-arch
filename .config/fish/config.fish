@@ -39,6 +39,7 @@ end
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export SXHKD_SHELL=sh
+alias ll='ls -Ahl'
 
 # Start X at login
 if status is-login

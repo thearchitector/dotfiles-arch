@@ -8,5 +8,5 @@
 !.xinitrc
 !.config/
 
-.config/pulse
 .config/dconf
+.config/nvim/.netrwhist
