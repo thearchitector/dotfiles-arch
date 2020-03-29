@@ -285,15 +285,9 @@ After installing GRUB, you can configure it by editing the default configuration
 
 While not necessary, I also recommend you install the proper microcode for your given system. Microcode is similar to CPU firmware, and is an abstraction above hardware-specific processs. Companies often release security patches and bug fixes to their CPUs' microcodes, so it is a good idea to install the latest release and allow GRUB to load it during boot time. As the microcode package you install differs depending on your physical system, I suggest you take a look at the official wiki page for more information (https://wiki.archlinux.org/index.php/Microcode). However, most systems will fall under one of the following two choices:
 
-#### Intel
-```sh
-  $ pacman -S intel-ucode
-```
+**Intel:** `pacman -S intel-ucode`
 
-#### AMD
-```sh
-  $ pacman -S amd-ucode
-```
+**AMD:** `pacman -S amd-ucode`
 
 Finally, you just need to tell GRUB to regenerate it's startup script. It will automatically include your installed microcode package as well as any changes you made in `/etc/default/grub`.
 
@@ -302,19 +296,22 @@ Finally, you just need to tell GRUB to regenerate it's startup script. It will a
 ```
 
 ## Connecting to a Network
-many network managers but this is the easiest
+In my own personal and professional experience, managing networks and network connections is one of the most challenging technical infrastructure problems of the 21st century. For this very reason, I suggest using network managers that abstract away much of the complicated setup, protocol management, and device polling. There are many network managers avaliable, but the easiest I have found is GNOME's NetworkManager (https://wiki.archlinux.org/index.php/NetworkManager). Install it like anything other package, and then enable it using `systemd`.
 
-pacman -S networkmanager
+```sh
+  $ pacman -S networkmanager
+  $ systemctl enable NetworkManager.service
+```
 
-systemctl enable NetworkManager.service
+For the changes to kick in, _you need to restart your computer and boot into the new installation._ This is a critical step, as it is the first time yet that we're testing your installation. If it works, then we know that everything will work smoothly from here on out.
 
-reboot into the installed system
+Assuming that you are now in the installation without the aid of the live USB, you can find and then connect to your desired network through the NetworkManager CLI. Once you connect, you can test the connection with `ping` like we did in the initial steps.
 
-nmcli device wifi list
-
-nmcli device wifi connect _SSID_ password _password_
-
-test with ping 1.1.1.1
+```sh
+  $ nmcli device wifi list
+  $ nmcli device wifi connect _SSID_ password _password_
+  $ ping 1.1.1.1
+```
 
 ## Creating your admin user
 using a lightweight alternative to `sudo`. it does 95% of what `sudo` does but with a much smaller and efficient codebase
