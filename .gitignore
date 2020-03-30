@@ -6,7 +6,15 @@
 !README.md
 !.gitignore
 !.xinitrc
-!.config/
 
-.config/dconf
+!.config/bspwm
+!.config/feh
+!.config/fish
+!.config/nvim
 .config/nvim/.netrwhist
+!.config/picom.conf
+!.config/pikaur.conf
+!.config/polybar
+!.config/rofi
+!.config/sxhkd
+!.config/termite
