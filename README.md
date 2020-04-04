@@ -8,7 +8,7 @@
 5. [Display/Window managers](#display-and-window-managers)
 
 ## Overview
-This repoistory contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch on a duel-booted machine. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities. **There are many different ways you can choose to setup your own machine, and I am not claiming that my way is the best way for you. Several factors have gone into the procedure outlined below, so if it does not fit your beliefs or needs simply don't follow it.**
+This repoistory contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch on a duel-booted machine. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities. **There are many different ways you can choose to setup your own machine and I am not claiming that my way is the best way for you. Several factors have gone into the procedure outlined below, so if it does not fit your beliefs or needs simply don't follow it to the tee.**
 
 ## Getting Started
 ### Formatting your USB
@@ -54,7 +54,7 @@ Once you've downloaded the ISO, you can easily burn it to your USB device using 
 Once you have a bootable ISO USB, you can restart your computer and boot into it manually through your manual boot menu. The ISO should automatically login as root and you should be placed in the root user's home directory. You can verify this is the case by running `ls` and checking if there is a file called `install.txt`.
 
 ### Configuring Wi-Fi
-You may run into a situation where you need to connect to the internet to successfully complete installation. To connect to Wi-Fi, run the following command. It will poll for avaliable devices and networks, and then open a UI prompting you to select a network and enter its connection credentials.
+You will need to connect to the internet to successfully complete installation. To connect to Wi-Fi, run the following command. It will poll for avaliable devices and networks, and then open a UI prompting you to select a network and enter its connection credentials.
 
 ```sh
   $ wifi-menu
@@ -303,9 +303,9 @@ In my own personal and professional experience, managing networks and network co
   $ systemctl enable NetworkManager.service
 ```
 
-For the changes to kick in, _you need to restart your computer and boot into the new installation._ This is a critical step, as it is the first time yet that we're testing your installation. If it works, then we know that everything will work smoothly from here on out.
+For the changes to kick in, _**you need to restart your computer and boot into the new installation.**_ This is a critical step, as it is the first time yet that we're testing your installation. If it works, then we know that everything will work smoothly from here on out.
 
-Assuming that you are now in the installation without the aid of the live USB, you can find and then connect to your desired network through the NetworkManager CLI. Once you connect, you can test the connection with `ping` like we did in the initial steps.
+Assuming that you are now in the installation without the aid of the live USB, you can find and then connect to your desired network through the NetworkManager CLI. Once you connect, you can test the connection with `ping` like we did in the steps above.
 
 ```sh
   $ nmcli device wifi list
@@ -313,38 +313,72 @@ Assuming that you are now in the installation without the aid of the live USB, y
   $ ping 1.1.1.1
 ```
 
-## Creating your admin user
-using a lightweight alternative to `sudo`. it does 95% of what `sudo` does but with a much smaller and efficient codebase
-
-pacman -S opendoas
-
-echo "permit persist keepenv :wheel" > /etc/doas.conf
-
-ln -sv /usr/bin/doas /usr/bin/sudo
-
-useradd -m -G wheel -s /usr/bin/fish egabriel
-
-passwd egabriel
-
-su egabriel
-
-## Installing an AUR helper
-definetly don't use `yaourt`, it's outdated, unmaintained, and has several security and functionality issues (https://github.com/archlinuxfr/yaourt/issues/382)
-
-i recommend pikaur (https://github.com/actionless/pikaur#pikaur), but realistically they're all going to do the same thing
-
-doas pacman -S fakeroot binutils make git gcc
+## Creating an Admin User
+### Installing OpenDoas
+If you are familar with UNIX systems, you have likely encountered the `sudo` command. At its core, `sudo` enables users to run processes with the security privleges of other users. However `sudo` comes with a lot of overhead an inefficiencies. For reaosns outlined in an initial blog post (https://flak.tedunangst.com/post/doas), I highly recommend `doas` instead. It is lightweight alternative to `sudo` and does 95% of what `sudo` does with a much smaller and efficient codebase. To install `doas`, install it like any other package:
 
 ```sh
+  $ pacman -S opendoas
+```
+
+In order to setup your admin user correctly, you need to enable the `wheel` group. Users in the `wheel` group have, among other critical system privleges, the ability to run the `doas` command. `doas` is at its heart very configurable, so enabling the `wheel` group is fairly simple. For additional compatibility I also recommend symlinking `sudo` to `doas`, as there are many scripts and packages that assume `sudo` is a valid command on any Linux system. Without symlinking, I guarantee that many things that _should_ work will not (namely installing packages and dependencies with build hooks).
+
+```sh
+  $ echo "permit persist keepenv :wheel" > /etc/doas.conf
+  $ ln -sv /usr/bin/doas /usr/bin/sudo
+```
+
+### Creating the user
+Now that we've installed `doas`, creating a new system user with admin privleges is a trivial task. Beforehand, however, I highly suggest installing your preferred shell. I recommend `fish`:
+
+> `fish` is a fully-equipped command line shell (like bash or zsh) that is smart and user-friendly. `fish` supports powerful features like syntax highlighting, autosuggestions, and tab completions that just work, with nothing to learn or configure. (https://fishshell.com/docs/current/tutorial.html)
+
+For whichever shell you decide to use, be it `fish`, `zsh`, or `bash`, make sure to `-s` option in the `useradd` command to reflect the path to the corresponding executable. For reference, the `-s` flag specifies your new user's default shell and the last argument is the name of your new user. For me, that is `egabriel` (for Elias Gabriel).
+
+At the same time, you need to specify the password for your new user. Because you're already logged in as `root`, you can simply change the password for your new user via the `passwd` command.
+
+```sh
+  $ useradd -m -G wheel -s /usr/bin/fish egabriel
+  $ passwd egabriel
+```
+
+Finally, to ensure that any future command you run are running and installing things under your new user, make sure to switch your session:
+
+```sh
+  $ su egabriel
+```
+
+## Customization
+Congratulations! If everything has working for you up until this point, which is by no means a gurantee, you have succssfully installed Arch Linux (have gotten smarter/more insane because of it). The next step is usually all about customization, so I will leave that up to your own research and preferences. If you're curious about my own setup, however, I encourage you to keep reading.
+
+### Installing an AUR helper
+If you're not aware, the Arch User Repository is one of the thing that makes Arch Linux and its ecosystem fantastic. In essence, the AUR is a community-driver package repository that hosts tons of packages and utilities outside of the ones officially distributed by the package databases. For the most part, you can find virtually any piece of software somewhere on the AUR, from Minecraft and Spotify to KiCad and MATLAB. The one challenge is that the AUR only hosts package build instructions, not prebuilt binaries.
+
+This is where AUR helpers come into play. There are many to choose from, but fundementally they all do virtually the same thing: they automate the download and build process for AUR packages. When it comes to selecting them, I can really only say two things:
+
+1. Definetly don't use `yaourt`. It's outdated, unmaintained, and has several security and functionality issues (https://github.com/archlinuxfr/yaourt/issues/382).
+2. There will be pros and cons to whatever you choose, but realistically they're all going to do the same thing.
+
+That being said, I searched around a lot for an AUR helper that filled my criteria. I wantd one that would wrap `pacman` for every package hosted on the official database and build every package from the AUR. Principally, however, I wanted one without tons of bloatcode and functionality that I would never use nor would ever find a use for. Those things combined, my search lead me to `pikaur` https://github.com/actionless/pikaur#pikaur.
+
+To install it, you have to download and build it manually because all AUR helper packages are hosted on the AUR; this is what we're trying to avoid in the future.
+
+```sh
+  $ doas pacman -S fakeroot binutils make git gcc
   $ git clone https://aur.archlinux.org/pikaur.git /tmp/pikaur
   $ cd /tmp/pikaur
   $ makepkg -fsri
 ```
 
-## Customization
+Once you've done that, you can now install any official or AUR-hosted package simply using `pikaur` instead of `pacman`. From a CLI perspective, they're nearly identical (which was another criteria for my selection).
 
-pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom termite sxhkd otf-font-awesome
+### Emulating my Environment
+My personal machine is configured to run X11 with `bspwm` as a tiling window manager. If you want to download and play with my dotfiles, just install the required packages, clone this repo to your machine, and symlink the necessary files. **If you care about your machine's current config, please make sure to backup the `~/.config` directory and `~/.xinitrc` file in your home directory. I am not responsible for dataloss on behalf of your mistakes.**
 
-git clone https://github.com/thearchitector/dotfiles-arch
-
-move `.config` and `.xinitrc` into home directory
+```sh
+  $ pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom termite sxhkd otf-font-awesome
+  $ git clone https://github.com/thearchitector/dotfiles-arch ~/.dotfiles
+  $ ln -s ~/.config ~/.dotfiles/.config
+  $ ln -s ~/.xinitrc ~/.dotfiles/.xinitrc
+  $ startx
+```
