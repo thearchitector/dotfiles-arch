@@ -314,7 +314,9 @@ Assuming that you are now in the installation without the aid of the live USB, y
 ```
 
 ## Creating an Admin User
-### Installing OpenDoas
+### Installing OpenDoas [optional]
+> _If you choose to skip this step, install `sudo` via `pacman -S sudo`._
+
 If you are familar with UNIX systems, you have likely encountered the `sudo` command. At its core, `sudo` enables users to run processes with the security privleges of other users. However `sudo` comes with a lot of overhead an inefficiencies. For reaosns outlined in an initial blog post (https://flak.tedunangst.com/post/doas), I highly recommend `doas` instead. It is lightweight alternative to `sudo` and does 95% of what `sudo` does with a much smaller and efficient codebase. To install `doas`, install it like any other package:
 
 ```sh
@@ -329,7 +331,7 @@ In order to setup your admin user correctly, you need to enable the `wheel` grou
 ```
 
 ### Creating the user
-Now that we've installed `doas`, creating a new system user with admin privleges is a trivial task. Beforehand, however, I highly suggest installing your preferred shell. I recommend `fish`:
+Now that we've installed `doas`/`sudo`, creating a new system user with admin privleges is a trivial task. Beforehand, however, I highly suggest installing your preferred shell. I recommend `fish`:
 
 > `fish` is a fully-equipped command line shell (like bash or zsh) that is smart and user-friendly. `fish` supports powerful features like syntax highlighting, autosuggestions, and tab completions that just work, with nothing to learn or configure. (https://fishshell.com/docs/current/tutorial.html)
 
@@ -348,7 +350,7 @@ Finally, to ensure that any future command you run are running and installing th
   $ su egabriel
 ```
 
-## Customization
+## Customization [optional]
 Congratulations! If everything has working for you up until this point, which is by no means a gurantee, you have succssfully installed Arch Linux (have gotten smarter/more insane because of it). The next step is usually all about customization, so I will leave that up to your own research and preferences. If you're curious about my own setup, however, I encourage you to keep reading.
 
 ### Installing an AUR helper
@@ -372,7 +374,7 @@ To install it, you have to download and build it manually because all AUR helper
 
 Once you've done that, you can now install any official or AUR-hosted package simply using `pikaur` instead of `pacman`. From a CLI perspective, they're nearly identical (which was another criteria for my selection).
 
-### Emulating my Environment
+### Emulating my environment
 My personal machine is configured to run X11 with `bspwm` as a tiling window manager. If you want to download and play with my dotfiles, just install the required packages, clone this repo to your machine, and symlink the necessary files. **If you care about your machine's current config, please make sure to backup the `~/.config` directory and `~/.xinitrc` file in your home directory. I am not responsible for dataloss on behalf of your mistakes.**
 
 ```sh
