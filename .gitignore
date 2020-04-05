@@ -12,7 +12,7 @@
 !.config/fish
 !.config/nvim
 .config/nvim/.netrwhist
-!.config/picom.conf
+!.config/picom
 !.config/pikaur.conf
 !.config/polybar
 !.config/rofi

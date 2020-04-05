@@ -1,3 +1,5 @@
+
+
 ""
 "" Plugins (using vim-plug)
 ""
@@ -5,7 +7,7 @@
 call plug#begin('~/.local/share/nvim/plugins')
 Plug 'mhinz/vim-startify'
 Plug 'itchyny/lightline.vim'
-Plug 'ajmwagar/vim-deus'
+Plug 'drewtempelmeyer/palenight.vim'
 call plug#end()
 
 
@@ -13,19 +15,22 @@ call plug#end()
 "" Configuration Options
 ""
 
+
+" generics
 syntax on
 set number
-set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab
+set showmatch
+set tabstop=2 softtabstop=0 expandtab shiftwidth=2 smarttab nojoinspaces
 set encoding=utf8
 set backspace=indent,eol,start
 set noshowmode
-set t_Co=256
-set termguicolors
+set splitbelow
+set splitright
+set formatoptions+=o
 
-let &t_8f = "\<Esc>[38;2%lu;%lu;%lum"
-let &t_8b = "\<Esc>[48;2%lu;%lu;%lum"
-
+" colorstuffs
 set background=dark
-let g:lightline = { 'colorscheme': 'deus' }
-colorscheme deus
-let g:deus_termcolors=256
+colorscheme palenight
+let g:lightline = { 'colorscheme': 'palenight' }
+set termguicolors
+let g:palenight_terminal_italics=1

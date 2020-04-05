@@ -20,11 +20,11 @@ super + {1-9}
 
 # raise volume
 XF86AudioRaiseVolume
-  amixer --quiet set Master 5%+
+  amixer --quiet set Master 4%+
 
 # lower volume
 XF86AudioLowerVolume
-  amixer --quiet set Master 5%-
+  amixer --quiet set Master 4%-
 
 # mute sound
 XF86AudioMute
