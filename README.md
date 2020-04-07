@@ -266,7 +266,9 @@ Finally, regenrate your `initramfs` files by running `mkinitcpio -P`.
 ### Updating your Clock
 Unless a miracle has happened, it is likely that your system's clock(s) will be incorrect. There are many options for synchronizing your clock and setting your timezones, but I suggest that you utilize an NTP server pool.
 
-<img align="left" width=450 src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Network_Time_Protocol_servers_and_clients.svg">
+<img align="left" width=400 src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Network_Time_Protocol_servers_and_clients.svg">
+
+The NTP server pool is a massively decentralized time keeping service that makes use of the NTP protocol (https://en.wikipedia.org/wiki/Network_Time_Protocol). There are many NTP servers avaliable, from the United States's official NIST time server (time.nist.gov) to Cloudflare's time service (https://www.cloudflare.com/time/). The power of the NTP pool is in its distribution network. Rather than have al
 
 ## Installing GRUB
 In order to boot into your installation, you need a boot loader. A boot loader is what is found by your computer's BIOS or UEFI on startup, and is what points your computer to OS loading files. I recommend GRUB 2 because is easy to setup, customizable, and versatile, but there are many other options you can choose from if you so desire (https://en.wikipedia.org/wiki/Comparison_of_boot_loaders). The installation procedure is different depending on if your system is BIOS-based or UEFI-based, so follow the options for your system:
