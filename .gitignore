@@ -6,6 +6,7 @@
 !README.md
 !.gitignore
 !.xinitrc
+!chrony.conf
 
 !.config/bspwm
 !.config/feh
