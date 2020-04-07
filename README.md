@@ -263,6 +263,11 @@ To more efficiently use your disk space, you can also enable compression of the 
 
 Finally, regenrate your `initramfs` files by running `mkinitcpio -P`.
 
+### Updating your Clock
+Unless a miracle has happened, it is likely that your system's clock(s) will be incorrect. There are many options for synchronizing your clock and setting your timezones, but I suggest that you utilize an NTP server pool.
+
+<img align="left" width=450 src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Network_Time_Protocol_servers_and_clients.svg">
+
 ## Installing GRUB
 In order to boot into your installation, you need a boot loader. A boot loader is what is found by your computer's BIOS or UEFI on startup, and is what points your computer to OS loading files. I recommend GRUB 2 because is easy to setup, customizable, and versatile, but there are many other options you can choose from if you so desire (https://en.wikipedia.org/wiki/Comparison_of_boot_loaders). The installation procedure is different depending on if your system is BIOS-based or UEFI-based, so follow the options for your system:
 
@@ -296,7 +301,7 @@ Finally, you just need to tell GRUB to regenerate it's startup script. It will a
 ```
 
 ## Connecting to a Network
-In my own personal and professional experience, managing networks and network connections is one of the most challenging technical infrastructure problems of the 21st century. For this very reason, I suggest using network managers that abstract away much of the complicated setup, protocol management, and device polling. There are many network managers avaliable, but the easiest I have found is GNOME's NetworkManager (https://wiki.archlinux.org/index.php/NetworkManager). Install it like anything other package, and then enable it using `systemd`.
+<F12>n my own personal and professional experience, managing networks and network connections is one of the most challenging technical infrastructure problems of the 21st century. For this very reason, I suggest using network managers that abstract away much of the complicated setup, protocol management, and device polling. There are many network managers avaliable, but the easiest I have found is GNOME's NetworkManager (https://wiki.archlinux.org/index.php/NetworkManager). Install it like anything other package, and then enable it using `systemd`.
 
 ```sh
   $ pacman -S networkmanager
