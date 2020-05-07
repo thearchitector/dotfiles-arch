@@ -286,11 +286,11 @@ To more efficiently use your disk space, you can also enable compression of the 
 
 Finally, regenerate your `initramfs` files by running `mkinitcpio -P`.
 
-<img align="left" width=450 src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Network_Time_Protocol_servers_and_clients.svg">
-
 ### Updating your clock
 
 Unless a miracle has happened, it is likely that your system's clock(s) will be incorrect. If it _is_ correct, then it will likely soon not be. There are many options for synchronizing your clock and setting your timezones, but I suggest that you utilize the NTP server pool.
+
+<img align="left" width=450 src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Network_Time_Protocol_servers_and_clients.svg">
 
 The NTP server pool is a massively decentralized time keeping service that makes use of the NTP protocol (<https://en.wikipedia.org/wiki/Network_Time_Protocol>). There are many individual NTP servers available, from the United States' official NIST time server (time.nist.gov) to Cloudflare's time service (<https://www.cloudflare.com/time/>). Rather than have every computer connect to the official servers directly, an immense networking challenge on its own, the power of the NTP pool is in its distribution network. The pool allows updates from those official servers to propagate to many different computers via a web of interconnected clients. In principle, each connected computer trusts that, when it asks a neighbor for the time, that neighbor is up to date. The root of that chain of assumptions, and the reason the entire system works, is that there exists at least one client that actually _is_ connected to the official server.
 
