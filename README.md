@@ -18,9 +18,11 @@ This repository contains the dotfiles for my Arch Linux installation, as well as
 
 ## Getting Started
 
+It will be less of a headache if you perform all these operations as root (via `su -` or `sudo`).
+
 ### Formatting your USB
 
-Before diving in, it is good practice to format your USB device first. After plugging in your USB, you should be identify it by running the command below. It will be less of a headache if you perform all these operations as root (via `su -` or `sudo`). Your USB device will likely be at the bottom of the STDOUT and will resemble something like the following:
+Before messing around with your USB, it's good practice to format it. After plugging in your USB, you should be able to identify it by running the command below. Your USB device will likely be at the bottom of the STDOUT and will resemble something like the following:
 
 ```sh
   $ fdisk -l
@@ -34,7 +36,7 @@ Before diving in, it is good practice to format your USB device first. After plu
   Disk identifier: 0x3372b9d9
 ```
 
-After identifying your drive, you can format it via `fdisk /dev/sda`. Keep it mind that you will likely have to chance `sda` to whatever you determined from the output of the previous command. Delete all the partitions from the disk with the `d` option, until `p` no longer lists any devices. If you are successful, running `lsblk` will show your USB device without any subdevices/partitions.
+After identifying your drive, you can format it via `fdisk /dev/sda`. Keep it mind that you will likely have to change `sda` to whatever you determined from the output above. Delete all the partitions from the disk with the `d` option, until `p` no longer lists any devices. If you are successful, running `lsblk` will show your USB device without any subdevices/partitions.
 
  ```sh
   $ lsblk
@@ -47,7 +49,7 @@ After identifying your drive, you can format it via `fdisk /dev/sda`. Keep it mi
 
 ### Burning the latest Arch Linux ISO
 
-You need the ISO file in order to burn it to a USB and install it on your computer. You can download the correct ISO for your region from the official download page here (<https://www.archlinux.org/download/>). Keep in mind that these ISOs might differ depending on mirror server, so choose it carefully and from a reputable source.
+You need an ISO file in order to burn it to a USB and install it on your computer. You can download the correct ISO for your region from the official download page here (<https://www.archlinux.org/download/>). Keep in mind that these ISOs might differ depending on which mirror server you choose, so pick carefully and from a reputable source.
 
 Once you've downloaded the ISO, you can easily burn it to your USB device using `dd`. Remember to point the `if` argument to the location to which you downloaded the ISO and the `of` argument to the USB device onto which to burn it. Depending on the capabilities of your drive and your USB protocol version, this might take a minute.
 
@@ -61,7 +63,7 @@ Once you've downloaded the ISO, you can easily burn it to your USB device using 
 
 ## Disk setup
 
-Once you have a bootable ISO USB, you can restart your computer and boot into it manually through your manual boot menu. The ISO should automatically login as root and you should be placed in the root user's home directory. You can verify this is the case by running `ls` and checking if there is a file called `install.txt`.
+Once you have a bootable ISO USB, you can restart your computer and boot into it manually through your BIOS/UEFI boot menu. The ISO should automatically login as root and place you into the root home directory. You can verify this is the case by running `ls` and checking if there is a file called `install.txt`.
 
 ### Configuring Wi-Fi
 
@@ -71,7 +73,7 @@ You will need to connect to the internet to successfully complete installation. 
   $ wifi-menu
 ```
 
-After entering credentials, you can verify that a connection has been established by pinging a known website. If successful, `ping` should report receiving 64-byte packets from your hostname:
+After entering the credentials, you can verify that a connection has been established by pinging a known website. If successful, `ping` should report receiving 64-byte packets from your hostname:
 
 ```sh
   $ ping 1.1.1.1
@@ -85,7 +87,7 @@ After entering credentials, you can verify that a connection has been establishe
 
 ### Partitioning
 
-To install Arch Linux, there must be allocated free space on some internal SSD/HDD. This installation guide will not go into how to shrink or delete existing partitions, but I recommend at least 100GiB as anything less than that starts to yield funky and unexpected failures when dealing with programs like Anaconda (<https://www.anaconda.com/distribution/>) and Docker (<https://docs.docker.com/install/>).
+To install Arch Linux, there must be allocated free space on some internal SSD/HDD of your machine. This installation guide will not go into how to shrink or delete existing partitions, but I recommend at least 100GiB - anything less and you'll have to start dealing with funky and unexpected failures from programs like Anaconda (<https://www.anaconda.com/distribution/>) and Docker (<https://docs.docker.com/install/>).
 
 #### Allocating the filesystem
 
@@ -110,7 +112,7 @@ A new subshell will open prompting you to enter `fdisk`-specific commands. You c
 
 <img align="right" width=450 src="https://upload.wikimedia.org/wikipedia/commons/e/e6/Lvm.svg">
 
-Note that `fdisk` mentions that it new partition will be created with the type 'Linux filesystem'. In most cases that is totally fine, as it would allow you to allocate the space using any UNIX filesystem like ext3 or ext4. However we intend on separating our Linux filesystem from the physical storage device with a layer known as LVM (Logical Volume Manager), the hope being that it will make our lives significantly easier if something goes wrong in the future. I highly recommend you read more about the design principles and reasoning behind LVM here (<https://wiki.archlinux.org/index.php/LVM#Background>), but you can get a general concept of how things are arranged by the diagram on the right.
+Note that `fdisk` mentions that a new partition will be created with the type 'Linux filesystem'. In most cases that is totally fine, as it would allow you to allocate the space using any UNIX filesystem like ext3 or ext4. However we intend on separating our Linux filesystem from the physical storage device with a layer known as LVM (Logical Volume Manager), the hope being that it will make our lives significantly easier if something goes wrong in the future. I highly recommend you read more about the design principles and reasoning behind LVM here (<https://wiki.archlinux.org/index.php/LVM#Background>), but you can get a general concept of how things are arranged by the diagram on the right.
 
 Continuing, we need to specify that the new partition we're making does not use a standard Linux filesystem directly. Rather, it uses a special bridge partition type called 'Linux LVM'. In the diagram above, this is the 'Physical Partition'. `fdisk` allows you to modify the type of partition it will make using the `t` subcommand:
 
@@ -133,7 +135,7 @@ The last step in partitioning is to tell `fdisk` to actually make the changes. Y
 
 ### Setting up LVM
 
-Now that the physical partition set, we can go ahead and continue to setup our different LVM abstraction layers. In this tutorial, the physical partition that was made is named `/dev/nvme0n1p5`, but will be different on your machine. **Make sure to change update your commands to respect that fact.**
+Now that the physical partition set, we can go ahead and continue to setup our different LVM abstraction layers. In this tutorial, the physical partition that was made is named `/dev/nvme0n1p5`, but will be different on your machine. **Make sure to change these commands to respect that fact.**
 
 #### Physical Volume
 
@@ -177,7 +179,7 @@ You can create all these logical volumes in a few short commands, where the `-L`
 
 ### Setting the filesystems
 
-Now that the logical volumes have been made, we need to "install" the appropriate filesystem onto each of them. I opt for ext4 (<https://en.wikipedia.org/wiki/Ext4>), as it is allegedly faster and can support larger file sizes, but ext3 (<https://en.wikipedia.org/wiki/Ext3>) works just as well (and perhaps even more stably).
+Now that the logical volumes have been made, we need to "install" the appropriate filesystem onto each of them. I opt for ext4 (<https://en.wikipedia.org/wiki/Ext4>), as it is newer, allegedly faster, and can support larger file sizes; realistically, however, ext3 (<https://en.wikipedia.org/wiki/Ext3>) works just as well (and perhaps even more stably).
 
 ```sh
   $ mkfs.ext4 /dev/vpool/root
@@ -205,7 +207,7 @@ Swap is tricky, as it has a specialized file structure different from standards 
 
 ## Installing the Essentials
 
-You now have fully functional logical volumes to use with Arch Linux. Congratulations! Now we can mount the drive, install the Linux kernel, device firmware, and the other utilities deemed essential for function. We can do both of those with the beloved `mount` and `pacstrap` command, which will download and install all the provided packages and package groups to the specified drive location.
+You now have fully functional logical volumes to use with Arch Linux. Congratulations! Now we can mount the drive, install the Linux kernel, device firmware, and the other utilities deemed essential for use. We can do both of those with the `mount` command and beloved `pacstrap` command, which will download and install all the provided packages and package groups to the specified drive location.
 
 ### Creating a better mirrorlist
 
@@ -216,7 +218,7 @@ The order of your mirrorlist, which is simply the list of URLs from which `pacma
   $ pacman -S reflector
 ```
 
-As a safety precaution, it is generally always a good idea to make a backup of critical files before modifying them. In this case, we want to make a backup of `/etc/pacman.d/mirrorlist` before we overwrite it. Then we can continue and create our new mirrorlist, making sure to update the country for your location:
+As a safety precaution, it is generally always a good idea to make a backup of critical files before modifying them. In this case, we want to make a backup of `/etc/pacman.d/mirrorlist` before we overwrite it. Then you can continue and create your new mirrorlist, making sure to update the country (`-c` option) for your location:
 
 ```sh
   $ cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.old
@@ -242,13 +244,13 @@ The latter command, depending on your internet speed, might take a while to comp
 
 ## Preparing your System
 
-To make you life easier, we can tell Linux to automatically mount all of our drives every time we boot into Arch. That way, we can avoid having to manually mount your drives every time we want to do something. Linux makes use of a filed called `fstab` to auto-remount drives at startup. Rather than manually listing our desired drives, we can export the current mount configuration directly to that file using `genfstab`. Since we had to mount all your drives to install the essentials above, we can simply export the current configuration.
+To make your life easier, we can tell Linux to automatically mount all of your drives every time we boot into Arch. That way, we can avoid having to manually mount your drives every time we want to do something. Linux makes use of a file called `fstab` to auto-remount drives at startup. Rather than manually listing our desired drives, we can export the current mount configuration directly to that file using `genfstab`. Since we already had to mount all your drives to install the essentials above, we can simply export the current configuration.
 
 ```sh
   $ genfstab -U /mnt >> /mnt/etc/fstab
 ```
 
-Once we've done that, we can `chroot` directly into our new installation. `chroot` changes the current working root directory from one folder to another. While this does not alter the programs that are currently running in the background (like `netctl`, which we started using `wifi-menu`), it ensures that any future changes we make to the filesystem will be relative to the new root rather than the current root (which is on our bootable ISO USB). In effect, any changes we make to your system after `chroot`-ing will be made to your permanent installation.
+Once we've done that, we can `chroot` directly into our new installation. `chroot` changes the current working root directory from one folder to another. While this does not alter the programs that are currently running in the background (like `netctl`, which we started using `wifi-menu`), it ensures that any future changes we make to the filesystem will be relative to the new root rather than the current root (which is on our bootable ISO USB). In effect, any changes we make to your system after `chroot`-ing will be made to your new permanent installation.
 
 ```sh
   $ arch-chroot /mnt
@@ -272,7 +274,7 @@ My system is configured to use American English encoded using UTF-8. Following t
 
 A key step in the boot cycle for any operating system involves loading programs and files necessary for the kernel to function. Without those files, the OS kernel might not have the knowledge or access to the resources required to load critical information from disk. On Linux, for example, hardware device drivers and information are needed to find, and then load, the root `/` filesystem. Rather than manually coding a myriad of special cases into the generically-distributed Linux kernel, each installation creates an "early user space" that contains all the information about your environment's setup so that the kernel can successfully load your system's root filesystem. If you'd like to know more, I recommend reading the Wikipedia article on the Linux startup process (<https://en.wikipedia.org/wiki/Linux_startup_process>) and the initial ramdisk scheme (<https://en.wikipedia.org/wiki/Initial_ramdisk>).
 
-On your machine, `mkinitcpio` is responsible for generating the initial ramdisk files for your system. Whenever the Linux kernel or other essential packages are updated, it regenerates the required boot files. As we setup your system to make use of LVM, your root filesystem is located on an a logical volume that is not directly readable by your kernel. As you can imagine, this means that in order for the kernel to mount your root directory your "early user space" needs to know how to navigate the LVM directory structure. Fortunately, all of that information is packaged into a loading "module", which can be injected into your "early user space". To enable the LVM module, we need to edit the `mkinitcpio` configuration file and include the `lvm2` module between the `block` and `filesystem` entries on the `HOOKS` line.
+On your machine, `mkinitcpio` is responsible for generating the initial ramdisk files for your system. Whenever the Linux kernel or other essential packages are updated, it regenerates the required boot files. As we setup your system to make use of LVM, your root filesystem is located on an a logical volume that is not directly readable by your kernel. As you can imagine this means that in order for the kernel to mount your root directory, your "early user space" needs to know how to navigate the LVM directory structure. Fortunately, all of that information is packaged into a loading "module" which can be injected into your "early user space". To enable the LVM module, we need to edit the `mkinitcpio` configuration file and include the `lvm2` module between the `block` and `filesystem` entries on the `HOOKS` line.
 
 ```sh
   $ nvim /etc/mkinitcpio.conf
@@ -282,23 +284,23 @@ On your machine, `mkinitcpio` is responsible for generating the initial ramdisk 
   HOOKS=(base udev ... block lvm2 filesystems)
 ```
 
-To more efficiently use your disk space, you can also enable compression of the generated files. This step is optional, but I recommend it if you are low of usable disk space. The method with the highest compression ratio is `xz`, which is an implementation of the LZMA2 compression algorithm. To enable it, simply uncomment `COMPRESSION=xz` and uncomment `COMPRESSION_OPTIONS` while `-e` to the list.
+To more efficiently use your disk space, you can also enable compression of the generated files. This step is optional, but I recommend it if you are low of usable disk space. The method with the highest compression ratio is `xz`, which is an implementation of the LZMA2 compression algorithm (<https://en.wikipedia.org/wiki/Lempel–Ziv–Markov_chain_algorithm>). To enable it, simply uncomment `COMPRESSION=xz`, uncomment `COMPRESSION_OPTIONS`, and add `-e` to that options list.
 
 Finally, regenerate your `initramfs` files by running `mkinitcpio -P`.
 
 ### Updating your clock
 
-Unless a miracle has happened, it is likely that your system's clock(s) will be incorrect. If it _is_ correct, then it will likely soon not be. There are many options for synchronizing your clock and setting your timezones, but I suggest that you utilize the NTP server pool.
+Unless a miracle has happened, it is likely that your system's clock(s) will be incorrect. If it _is_ correct, then it will likely soon not be. There are many options for synchronizing your clock and setting your timezone, but I suggest that you utilize the NTP server pool.
 
 <img align="left" width=450 src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Network_Time_Protocol_servers_and_clients.svg">
 
 The NTP server pool is a massively decentralized time keeping service that makes use of the NTP protocol (<https://en.wikipedia.org/wiki/Network_Time_Protocol>). There are many individual NTP servers available, from the United States' official NIST time server (time.nist.gov) to Cloudflare's time service (<https://www.cloudflare.com/time/>). Rather than have every computer connect to the official servers directly, an immense networking challenge on its own, the power of the NTP pool is in its distribution network. The pool allows updates from those official servers to propagate to many different computers via a web of interconnected clients. In principle, each connected computer trusts that, when it asks a neighbor for the time, that neighbor is up to date. The root of that chain of assumptions, and the reason the entire system works, is that there exists at least one client that actually _is_ connected to the official server.
 
-You might think that the network delays between varying clients will cause a synchronization problem, since the propagation of literally anything in our universe is not instant (like how you observe lightning and thunder happening at different times even though they occur simultaneously). Well, the people who came up with the NTP pool and protocols are pretty clever and figure out a way around that, so don't fret.
+You might think that the network delays between varying clients will cause a synchronization problem, since the propagation of literally anything in our universe is not instant (like how you observe lightning and thunder happening at different times even though they occur simultaneously). You would be right, but the people who came up with the NTP pool and protocol are pretty clever and figured out a way around that.
 
 #### Installing chrony
 
-To use the NTP pool you need an application that supports clock synchronization via the NTP protocol. chrony (<https://chrony.tuxfamily.org>) is one such utility, and I recommend it because it's easy to install and configure. You can install chrony like any other package:
+To use the NTP pool you need an application that supports clock synchronization via the NTP protocol. chrony (<https://chrony.tuxfamily.org>) is one such utility, and I recommend it because it's up to date, maintained, easy to install, and simple to configure. You can install chrony like any other package:
 
 ```sh
   $ pacman -S chrony
@@ -321,11 +323,11 @@ Before things will work you have create a viable configuration file as well as e
   $ systemctl enable chronyd
 ```
 
-> My personal config file contains more tweaks to try and optimize reliability and performance. If time synchronization is your passion, feel free to read my config here ([chrony.conf](chrony.conf)).
+> My personal config file contains more tweaks to try and optimize reliability and performance. If time synchronization is your passion, feel free to use my config here ([chrony.conf](chrony.conf)).
 
 ## Installing GRUB
 
-In order to boot into your installation, you need a boot loader. A boot loader is what is found by your computer's BIOS or UEFI on startup, and is what points your computer to OS loading files. I recommend GRUB 2 because is easy to setup, customizable, and versatile, but there are many other options you can choose from if you so desire (<https://en.wikipedia.org/wiki/Comparison_of_boot_loaders>). The installation procedure is different depending on if your system is BIOS-based or UEFI-based, so follow the options for your system:
+In order to boot into your installation, you need a boot loader. A boot loader is what is found by your computer's BIOS/UEFI on startup, and is what points your computer to OS loading files. I recommend GRUB 2 because is easy to setup, customizable, and versatile, but there are many other options you can choose from if you so desire (<https://en.wikipedia.org/wiki/Comparison_of_boot_loaders>). The installation procedure is different depending on if your system is BIOS-based or UEFI-based, so follow the options for your system:
 
 ### BIOS-based
 
@@ -343,7 +345,7 @@ In order to boot into your installation, you need a boot loader. A boot loader i
   $ grub-install --target=$(uname -m)-efi --efi-directory=/boot --bootloader-id="Arch Linux"
 ```
 
-After installing GRUB, you can configure it by editing the default configuration file via `nvim /etc/default/grub`. On my machine, I set `GRUB_TIMEOUT=-1` to prevent the auto-booting into any OS. Besides any other configuration you do, make sure to add `lvm` to the end of `GRUB_PRELOAD_MODULES`.
+After installing GRUB, you can configure it by editing the default configuration file via `nvim /etc/default/grub`. On my machine, I set `GRUB_TIMEOUT=-1` to prevent auto-booting into any OS. In addition to any other configuration you do, make sure to add `lvm` to the end of `GRUB_PRELOAD_MODULES`.
 
 While not necessary, I also recommend you install the proper microcode for your given system. Microcode is similar to CPU firmware, and is an abstraction above hardware-specific processes. Companies often release security patches and bug fixes to their CPUs' microcodes, so it is a good idea to install the latest release and allow GRUB to load it during boot time. As the microcode package you install differs depending on your physical system, I suggest you take a look at the official wiki page for more information (<https://wiki.archlinux.org/index.php/Microcode>). However, most systems will fall under one of the following two choices:
 
@@ -366,7 +368,7 @@ In my own personal and professional experience, managing networks and network co
   $ systemctl enable NetworkManager.service
 ```
 
-For the changes to kick in, _**you need to restart your computer and boot into the new installation.**_ This is a critical step, as it is the first time yet that we're testing your installation. If it works, then we know that everything will work smoothly from here on out.
+For the changes to kick in, _**you need to restart your computer and boot into the new installation.**_ This is a critical step, as it is the first time yet that we're testing your installation. If it works, then we know that everything will work smoothly from here on out. If it doesn't, then I'm sorry.
 
 Assuming that you are now in the installation without the aid of the live USB, you can find and then connect to your desired network through the NetworkManager CLI. Once you connect, you can test the connection with `ping` like we did in the steps above.
 
@@ -380,15 +382,15 @@ Assuming that you are now in the installation without the aid of the live USB, y
 
 ### Installing OpenDoas [optional]
 
-> _If you choose to skip this step, install `sudo` via `pacman -S sudo`._
+> _If you choose to skip this step, install `sudo` via `pacman -S sudo` and setup the sudoers and wheel groups._
 
-If you are familar with UNIX systems, you have likely encountered the `sudo` command. At its core, `sudo` enables users to run processes with the security privleges of other users. However `sudo` comes with a lot of overhead an inefficiencies. For reaosns outlined in an initial blog post (<https://flak.tedunangst.com/post/doas>), I highly recommend `doas` instead. It is lightweight alternative to `sudo` and does 95% of what `sudo` does with a much smaller and efficient codebase. To install `doas`, install it like any other package:
+If you are familar with UNIX systems, you have likely encountered the `sudo` command. At its core, `sudo` enables users to run processes with the security privleges of other users. However `sudo` comes with a lot of overhead an inefficiencies. For reaosns outlined in its initial blog post (<https://flak.tedunangst.com/post/doas>), I instead highly recommend `doas`. It is lightweight alternative to `sudo` and does 95% of what `sudo` does with a much smaller and efficient codebase. It's also what OpenBSD uses. To install `doas`, install it like any other package:
 
 ```sh
   $ pacman -S opendoas
 ```
 
-In order to setup your admin user correctly, you need to enable the `wheel` group. Users in the `wheel` group have, among other critical system privleges, the ability to run the `doas` command. `doas` is at its heart very configurable, so enabling the `wheel` group is fairly simple. For additional compatibility I also recommend symlinking `sudo` to `doas`, as there are many scripts and packages that assume `sudo` is a valid command on any Linux system. Without symlinking, I guarantee that many things that _should_ work will not (namely installing packages and dependencies with build hooks).
+In order to setup your admin user correctly, you need to enable the `wheel` group. Users in the `wheel` group have, among other critical system privleges, the ability to run the `doas` command. `doas` is at its heart very configurable, so enabling the `wheel` group is fairly simple. For additional compatibility I also recommend symlinking `sudo` to `doas`, as there are many scripts and packages that assume `sudo` is a valid command on any Linux system. **Without symlinking, I guarantee that many things that _should_ work will not (namely installing packages and dependencies with build hooks).**
 
 ```sh
   $ echo "permit persist keepenv :wheel" > /etc/doas.conf
@@ -401,7 +403,7 @@ Now that we've installed `doas`/`sudo`, creating a new system user with admin pr
 
 > `fish` is a fully-equipped command line shell (like bash or zsh) that is smart and user-friendly. `fish` supports powerful features like syntax highlighting, autosuggestions, and tab completions that just work, with nothing to learn or configure (<https://fishshell.com/docs/current/tutorial.html>).
 
-For whichever shell you decide to use, be it `fish`, `zsh`, or `bash`, make sure to `-s` option in the `useradd` command to reflect the path to the corresponding executable. For reference, the `-s` flag specifies your new user's default shell and the last argument is the name of your new user. For me, that is `egabriel` (for Elias Gabriel).
+For whichever shell you decide to use, be it `fish`, `zsh`, or `bash`, make sure to change the `-s` option in the `useradd` command to reflect the path to the corresponding executable. For reference, the `-s` flag specifies your new user's default shell and the last argument is the name of your new user. For me, that is `egabriel` (for Elias Gabriel).
 
 At the same time, you need to specify the password for your new user. Because you're already logged in as `root`, you can simply change the password for your new user via the `passwd` command.
 
@@ -410,7 +412,7 @@ At the same time, you need to specify the password for your new user. Because yo
   $ passwd egabriel
 ```
 
-Finally, to ensure that any future command you run are running and installing things under your new user, make sure to switch your session:
+Finally, to ensure that any future command you run are running and installing things under your new user, make sure to switch your session. If you don't switch, many things will be created with incorrect file privileges and likely not work.
 
 ```sh
   $ su egabriel
@@ -418,20 +420,20 @@ Finally, to ensure that any future command you run are running and installing th
 
 ## Customization [optional]
 
-Congratulations! If everything has working for you up until this point, which is by no means a gurantee, you have succssfully installed Arch Linux (have gotten smarter/more insane because of it). The next step is usually all about customization, so I will leave that up to your own research and preferences. If you're curious about my own setup, however, I encourage you to keep reading.
+Congratulations! If everything has working for you up until this point, which is by no means a gurantee, you have succssfully installed Arch Linux (and have gotten smarter because of it). The next step is all about customization, so I will leave that up to your own research and preferences. If you're curious about my own setup, however, I encourage you to keep reading.
 
 ### Installing an AUR helper
 
-If you're not aware, the Arch User Repository is one of the thing that makes Arch Linux and its ecosystem fantastic. In essence, the AUR is a community-driver package repository that hosts tons of packages and utilities outside of the ones officially distributed by the package databases. For the most part, you can find virtually any piece of software somewhere on the AUR, from Minecraft and Spotify to KiCad and MATLAB. The one challenge is that the AUR only hosts package build instructions, not prebuilt binaries.
+If you're not aware, the Arch User Repository is one of the things that make Arch Linux and its ecosystem fantastic. In short, the AUR is a community-driver package repository that hosts tons of packages and utilities outside of the ones officially distributed by the package databases. For the most part, you can find virtually any piece of software somewhere on the AUR, from Minecraft and Spotify to KiCad and MATLAB. The one challenge is that the AUR only hosts package build instructions, not prebuilt binaries.
 
-This is where AUR helpers come into play. There are many to choose from, but fundementally they all do virtually the same thing: they automate the download and build process for AUR packages. When it comes to selecting them, I can really only say two things:
+This is where AUR helpers come into play. There are many to choose from, but fundementally they all do virtually the same thing: they automate the download and build process for AUR packages. When it comes to selecting one of them, I can really only say two things:
 
 1. Definetly don't use `yaourt`. It's outdated, unmaintained, and has several security and functionality issues (<https://github.com/archlinuxfr/yaourt/issues/382>).
 2. There will be pros and cons to whatever you choose, but realistically they're all going to do the same thing.
 
-That being said, I searched around a lot for an AUR helper that filled my criteria. I wantd one that would wrap `pacman` for every package hosted on the official database and build every package from the AUR. Principally, however, I wanted one without tons of bloatcode and functionality that I would never use nor would ever find a use for. Those things combined, my search lead me to `pikaur` <https://github.com/actionless/pikaur#pikaur.>
+That being said, I searched around a lot for an AUR helper that filled my criteria. I wanted one that would wrap `pacman` for every package hosted on the official database while still searching for and building every package from the AUR. Principally, however, I wanted one without tons of bloatcode and functionality that I would never use nor would ever find a use for. Those things combined, my search lead me to `pikaur` <https://github.com/actionless/pikaur#pikaur.>
 
-To install it, you have to download and build it manually because all AUR helper packages are hosted on the AUR; this is what we're trying to avoid in the future.
+To install it you have to download and build it manually, since all AUR helper packages are hosted on the AUR; this is what we're trying to avoid in the future.
 
 ```sh
   $ doas pacman -S fakeroot binutils make git gcc
@@ -449,8 +451,8 @@ My personal machine is configured to run X11 with `bspwm` as a tiling window man
 ```sh
   $ pikaur -S xorg-server xorg-xinit bspwm polybar rofi picom termite sxhkd otf-font-awesome
   $ git clone https://github.com/thearchitector/dotfiles-arch ~/.dotfiles
-  $ ln -s ~/.config ~/.dotfiles/.config
-  $ ln -s ~/.xinitrc ~/.dotfiles/.xinitrc
-  $ ln -s /etc/chrony.conf ~/.dotfiles/chrony.conf
+  $ ln -sv ~/.config ~/.dotfiles/.config
+  $ ln -sv ~/.xinitrc ~/.dotfiles/.xinitrc
+  $ ln -sv /etc/chrony.conf ~/.dotfiles/chrony.conf
   $ startx
 ```
