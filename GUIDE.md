@@ -22,7 +22,7 @@ This is a step-by-step guide on how to install Arch Linux from scratch. It assum
 
 You need an ISO file in order to burn it to a USB and install it on your computer. You can download the correct ISO for your region from the official download page here (<https://www.archlinux.org/download/>). Keep in mind that these ISOs might differ depending on which mirror server you choose, so pick carefully and from a reputable source.
 
-### Burning the ISO file
+#### Burning the ISO image
 
 **Windows**
 
@@ -73,7 +73,7 @@ Once you have a bootable ISO USB, you can restart your computer and boot into it
 
 ### Configuring Wi-Fi
 
-You will need to connect to the internet to successfully complete installation. To connect to Wi-Fi, you need to know the SSID (name) and password for the network to which you want to connect. You also need to know the name of the network device your computer uses. Usually it's `wlan0`, but you can find out by running:
+You will need to connect to the internet to successfully complete installation. If you have an ethernet connection, you can skip this step as your connection should work automatically. To connect to Wi-Fi, you need to know the SSID (name) and password for the network to which you want to connect. You also need to know the name of the network device your computer uses. Usually it's `wlan0`, but you can find out by running:
 
 ```sh
   $ iwctl device list
@@ -101,9 +101,7 @@ After entering the credentials, you can verify that a connection has been establ
 
 To install Arch Linux, there must be allocated free space on some internal SSD/HDD of your machine. This installation guide will not go into how to shrink or delete existing partitions, but I recommend at least 100GiB - anything less and you'll have to start dealing with funky and unexpected failures from programs like Anaconda (<https://www.anaconda.com/distribution/>) and Docker (<https://docs.docker.com/install/>).
 
-#### Allocating the filesystem
-
-In order to use the available space on your internal storage device, you must allocate that space to a partition. _Please note that you should already know the physical device onto which you are going to install Arch. In this tutorial that device is `/dev/nvme0n1`, but it will almost certainly be different on your machine._
+In order to partition, you must know the name of the physical device onto which you are going to install Arch. In this tutorial that device is `/dev/nvme0n1`, but it will almost certainly be different on your machine. You can determine which device you want via the `lsblk` command.
 
 To initialize the partitioning, we can again use the `fdisk` command:
 
@@ -113,7 +111,7 @@ To initialize the partitioning, we can again use the `fdisk` command:
 
 A new subshell will open prompting you to enter `fdisk`-specific commands. You can check the list of commands and their descriptions by entering `m`. 
 
-**Cre
+#### [Skip if Windows is already installed] Creating a EFI system partition
 
 As we want to create a new partition, we can simply follow the default process and leave all the default values unchanged:
 
