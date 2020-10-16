@@ -14,13 +14,23 @@
 
 ## Overview
 
-This repository contains the dotfiles for my Arch Linux installation, as well as a step-by-step guide on how to install Arch Linux from scratch on a duel-booted machine. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities. **There are many different ways you can choose to setup your own machine and I am not claiming that my way is the best way for you. Several factors have gone into the procedure outlined below, so if it does not fit your beliefs or needs simply don't follow it to the tee.**
+This is a step-by-step guide on how to install Arch Linux from scratch. It assumes you have a working knowledge of UNIX and a functional knowledge of basic GNU and CLI utilities. There are many different ways you can choose to setup your own machine and I am not claiming that my way is the best way for you. Several factors have gone into the procedure outlined below, so if it does not fit your beliefs or needs simply don't follow it to the tee.
 
 ## Getting Started
 
-It will be less of a headache if you perform all these operations as root (via `su -` or `sudo`).
+### Creating a bootable USB
 
-### Formatting your USB
+You need an ISO file in order to burn it to a USB and install it on your computer. You can download the correct ISO for your region from the official download page here (<https://www.archlinux.org/download/>). Keep in mind that these ISOs might differ depending on which mirror server you choose, so pick carefully and from a reputable source.
+
+### Burning the ISO file
+
+**Windows**
+
+On Windows, you can use a lot of different programs to burn ISO images onto USB devices. I recommend using Rufus (<https://rufus.ie/>), as it's extremely simple to use and quite versatile.
+
+To write the file, select your downloaded file. Make sure that you select **GPT** in the _Partition scheme_ dropdown. If you have a UEFI system, select **UEFI (non CSM)** from the _Target system_ dropdown. Once you click _START_ you will be prompted to select your write mode. **While the recommended mode is _ISO_, I suggest selecting _DD_ as _ISO_ can sometimes result in a boot failure.** Depending on the capabilities of your drive and your USB protocol version, this might take a minute.
+
+**Linux**
 
 Before messing around with your USB, it's good practice to format it. After plugging in your USB, you should be able to identify it by running the command below. Your USB device will likely be at the bottom of the STDOUT and will resemble something like the following:
 
@@ -47,10 +57,6 @@ After identifying your drive, you can format it via `fdisk /dev/sda`. Keep it mi
     ...
 ```
 
-### Burning the latest Arch Linux ISO
-
-You need an ISO file in order to burn it to a USB and install it on your computer. You can download the correct ISO for your region from the official download page here (<https://www.archlinux.org/download/>). Keep in mind that these ISOs might differ depending on which mirror server you choose, so pick carefully and from a reputable source.
-
 Once you've downloaded the ISO, you can easily burn it to your USB device using `dd`. Remember to point the `if` argument to the location to which you downloaded the ISO and the `of` argument to the USB device onto which to burn it. Depending on the capabilities of your drive and your USB protocol version, this might take a minute.
 
 ```sh
@@ -67,10 +73,16 @@ Once you have a bootable ISO USB, you can restart your computer and boot into it
 
 ### Configuring Wi-Fi
 
-You will need to connect to the internet to successfully complete installation. To connect to Wi-Fi, run the following command. It will poll for available devices and networks, and then open a UI prompting you to select a network and enter its connection credentials.
+You will need to connect to the internet to successfully complete installation. To connect to Wi-Fi, you need to know the SSID (name) and password for the network to which you want to connect. You also need to know the name of the network device your computer uses. Usually it's `wlan0`, but you can find out by running:
 
 ```sh
-  $ wifi-menu
+  $ iwctl device list
+```
+
+Once you know the device, connect to your network using the following command. If your network requires a password, it will prompt you for it.
+
+```sh
+  $ iwctl station <DEVICE NAME> connect <SSID>
 ```
 
 After entering the credentials, you can verify that a connection has been established by pinging a known website. If successful, `ping` should report receiving 64-byte packets from your hostname:
@@ -99,13 +111,17 @@ To initialize the partitioning, we can again use the `fdisk` command:
   $ fdisk /dev/nvme0n1
 ```
 
-A new subshell will open prompting you to enter `fdisk`-specific commands. You can check the list of commands and their descriptions by entering `m`. As we want to create a new partition, we can simply follow the default process and leave all the default values unchanged:
+A new subshell will open prompting you to enter `fdisk`-specific commands. You can check the list of commands and their descriptions by entering `m`. 
+
+**Cre
+
+As we want to create a new partition, we can simply follow the default process and leave all the default values unchanged:
 
 ```sh
   Command (m for help): n
-  Partition number (5-128, default 5): 5
-  First sector (532828020-1000215182, default 532828020): 532828020
-  Last sector, +/-sectors or +/-size{K,M,G,T,P} (532828020-1000215182, default 1000215182): 1000215182
+  Partition number (5-128, default 5):
+  First sector (532828020-1000215182, default 532828020):
+  Last sector, +/-sectors or +/-size{K,M,G,T,P} (532828020-1000215182, default 1000215182):
 
   Created new partition 5 of type 'Linux filesystem' and of size 222.9 GiB.
 ```
