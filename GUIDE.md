@@ -69,33 +69,7 @@ Once you've downloaded the ISO, you can easily burn it to your USB device using 
 
 ## Disk setup
 
-Once you have a bootable ISO USB, you can restart your computer and boot into it manually through your BIOS/UEFI boot menu. The ISO should automatically login as root and place you into the root home directory. You can verify this is the case by running `ls` and checking if there is a file called `install.txt`.
-
-### Configuring Wi-Fi
-
-You will need to connect to the internet to successfully complete installation. If you have an ethernet connection, you can skip this step as your connection should work automatically. To connect to Wi-Fi, you need to know the SSID (name) and password for the network to which you want to connect. You also need to know the name of the network device your computer uses. Usually it's `wlan0`, but you can find out by running:
-
-```sh
-  $ iwctl device list
-```
-
-Once you know the device, connect to your network using the following command. If your network requires a password, it will prompt you for it.
-
-```sh
-  $ iwctl station <DEVICE NAME> connect <SSID>
-```
-
-After entering the credentials, you can verify that a connection has been established by pinging a known website. If successful, `ping` should report receiving 64-byte packets from your hostname:
-
-```sh
-  $ ping 1.1.1.1
-  PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data.
-  64 bytes from 1.1.1.1: icmp_seq=1 ttl=59 time=17.6 ms
-  64 bytes from 1.1.1.1: icmp_seq=2 ttl=59 time=23.3 ms
-
-  --- 1.1.1.1 ping statistics ---
-  2 packets transmitted, 2 received, 0% packet loss, time 2004ms
-```
+Once you have a bootable ISO USB, you can restart your computer and boot into it manually through your BIOS/UEFI boot menu. The ISO should automatically login as root and place you into the root home directory. You can verify by checking for a welcome message at the top of the shell.
 
 ### Partitioning
 
@@ -109,9 +83,11 @@ To initialize the partitioning, we can again use the `fdisk` command:
   $ fdisk /dev/nvme0n1
 ```
 
-A new subshell will open prompting you to enter `fdisk`-specific commands. You can check the list of commands and their descriptions by entering `m`. 
+A new subshell will open prompting you to enter `fdisk`-specific commands. You can check the list of commands and their descriptions by entering `m`.
 
-#### [Skip if Windows is already installed] Creating a EFI system partition
+#### [Skip if using BIOS / Windows is already installed] Creating a EFI system partition
+
+On UEFI systems, there is a separate OS-independent partition that contains the bootloaders and applications necessary to boot. On UEFI-capable machines with Windows already installed, the EFI system partiton is already created.
 
 As we want to create a new partition, we can simply follow the default process and leave all the default values unchanged:
 
@@ -222,6 +198,32 @@ Swap is tricky, as it has a specialized file structure different from standards 
 ## Installing the Essentials
 
 You now have fully functional logical volumes to use with Arch Linux. Congratulations! Now we can mount the drive, install the Linux kernel, device firmware, and the other utilities deemed essential for use. We can do both of those with the `mount` command and beloved `pacstrap` command, which will download and install all the provided packages and package groups to the specified drive location.
+
+### Configuring Wi-Fi
+
+You will need to connect to the internet to successfully complete installation. If you have an ethernet connection, you can skip this step as your connection should work automatically. To connect to Wi-Fi, you need to know the SSID (name) and password for the network to which you want to connect. You also need to know the name of the network device your computer uses. Usually it's `wlan0`, but you can find out by running:
+
+```sh
+  $ iwctl device list
+```
+
+Once you know the device, connect to your network using the following command. If your network requires a password, it will prompt you for it.
+
+```sh
+  $ iwctl station <DEVICE NAME> connect <SSID>
+```
+
+After entering the credentials, you can verify that a connection has been established by pinging a known website. If successful, `ping` should report receiving 64-byte packets from your hostname:
+
+```sh
+  $ ping 1.1.1.1
+  PING 1.1.1.1 (1.1.1.1) 56(84) bytes of data.
+  64 bytes from 1.1.1.1: icmp_seq=1 ttl=59 time=17.6 ms
+  64 bytes from 1.1.1.1: icmp_seq=2 ttl=59 time=23.3 ms
+
+  --- 1.1.1.1 ping statistics ---
+  2 packets transmitted, 2 received, 0% packet loss, time 2004ms
+```
 
 ### Creating a better mirrorlist
 
